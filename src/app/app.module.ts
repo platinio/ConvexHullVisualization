@@ -1,9 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule , Injectable } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CanvasComponent } from './canvas/canvas.component';
+
+import { TweenService } from './canvas/services/tween.service';
 
 @NgModule({
   declarations: [
@@ -14,7 +16,12 @@ import { CanvasComponent } from './canvas/canvas.component';
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [ TweenService ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+
+@Injectable()
+export class AppModule
+{
+    constructor(private tweenService : TweenService){}
+}

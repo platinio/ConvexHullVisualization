@@ -1,10 +1,9 @@
-import { Component , ViewChild , ElementRef , OnInit , NgZone} from '@angular/core';
+import { Component , ViewChild , ElementRef , OnInit , NgZone , Injectable} from '@angular/core';
 import { Application , Graphics } from 'pixi.js';
 import { Point } from './point.model';
+import { TweenService } from './services/tween.service';
 
-//declare var TWEEN : any;
 
-declare var createjs: any;
 
 @Component({
 
@@ -14,11 +13,11 @@ declare var createjs: any;
 })
 
 
-
+@Injectable()
 export class CanvasComponent implements OnInit
 {
   private app: Application;
-  private stage: any;
+
   private screenSize = {x: 2048 , y: 1024};
   private pointList : Point[];
 
@@ -26,72 +25,23 @@ export class CanvasComponent implements OnInit
   //coords = { x: 0, y: 0 };
 
 
-  constructor(private elementRef: ElementRef, private ngZone: NgZone) {}
+  constructor(private tweenService : TweenService , private elementRef: ElementRef, private ngZone: NgZone) {}
 
 
 
   ngOnInit(): void
   {
 
-    this.setupCreatejs();
+    //this.setupCreatejs();
     this.setupPixijs();
     this.pointList = [];
-
-    /*
-    //var ellipse = new Graphics();
-    this.ellipse = new Graphics();
-    this.ellipse.beginFill(0xFFFF00);
-    this.ellipse.drawEllipse(0, 0, 50, 20);
-    this.ellipse.endFill();
-    this.ellipse.x = 500;
-    this.ellipse.y = 500;
-    this.app.stage.addChild(this.ellipse);
-
-    //TweenManager.scaleTween( 5 , (x : number , y : number) => {  } );*/
-
-      //this.app.ticker.add(delta => this.gameLoop(delta));
-      //this.app.ticker.add(delta => TweenManager.update(delta));
-
-      //const
-      /*
-      const tween = new TWEEN.Tween(coords) // Create a new tween that modifies 'coords'.
-        .to({ x: 300, y: 200 }, 1000) // Move to (300, 200) in 1 second.
-        .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
-        .onUpdate(() => { // Called after tween.js updates 'coords'.
-            // Move 'box' to the position described by 'coords' with a CSS translation.
-            //box.style.setProperty('transform', `translate(${coords.x}px, ${coords.y}px)`);
-
-            this.ellipse.x = coords.x;
-            alert("hi");
-        })
-        .start();*/
-        /*
-        const tween = new TWEEN.Tween(coords).to({ x: 300, y: 200 }, 1000).easing(TWEEN.Easing.Quadratic.Out).onUpdate(() => {
-
-          alert("hi");
-
-        })
-        .start();*/
-        /*
-        createjs.Tween.get(this.ellipse.scale)
-        .to({ x: 400 }, 1000, createjs.Ease.getPowInOut(4));
-
+/*
         createjs.Ticker.setFPS(60);
 
         createjs.Ticker.addEventListener("tick", this.stage);*/
 
-        createjs.Ticker.setFPS(60);
-
-        createjs.Ticker.addEventListener("tick", this.stage);
-
   }
 
-  private setupCreatejs()
-  {
-      this.stage = new createjs.Stage("tweens");
-      createjs.Ticker.setFPS(60);
-      createjs.Ticker.addEventListener("tick", this.stage);
-  }
 
   private setupPixijs()
   {
@@ -118,7 +68,6 @@ export class CanvasComponent implements OnInit
       this.app.stage.interactive = true;
       this.app.stage.buttonMode = true;
       this.app.stage.on("mousedown" , (event) => { this.handleClick(event); });
-
 
   }
 
@@ -148,7 +97,7 @@ export class CanvasComponent implements OnInit
       point.y = y;
       this.app.stage.addChild(point);*/
 
-      this.pointList.push( new Point( this.app.stage , x , y ) );
+      this.pointList.push( new Point( this.tweenService , this.app.stage , x , y ) );
   }
 
 
