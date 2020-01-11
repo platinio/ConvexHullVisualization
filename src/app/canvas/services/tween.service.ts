@@ -1,3 +1,5 @@
+import { Vector2 } from '../point.model';
+
 declare var createjs: any;
 
 export class TweenService
@@ -11,8 +13,8 @@ export class TweenService
         createjs.Ticker.addEventListener("tick", this.stage);
     }
 
-    public scaleTween(target : any , x : number , y : number , time : number)
+    public scaleTween(target: any , to : Vector2 , time : number)
     {
-        createjs.Tween.get(target).to({ x: x , y : y }, time , createjs.Ease.elasticOut);
+        createjs.Tween.get(target).to({ x: to.x , y : to.y }, time , createjs.Ease.elasticOut);
     }
 }

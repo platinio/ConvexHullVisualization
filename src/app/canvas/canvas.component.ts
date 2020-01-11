@@ -1,7 +1,8 @@
 import { Component , ViewChild , ElementRef , OnInit , NgZone , Injectable} from '@angular/core';
 import { Application , Graphics } from 'pixi.js';
-import { Point } from './point.model';
+import { Point , Vector2 } from './point.model';
 import { TweenService } from './services/tween.service';
+import { GiftWrappingService } from './services/gif-wrapping.service';
 
 
 
@@ -35,10 +36,6 @@ export class CanvasComponent implements OnInit
     //this.setupCreatejs();
     this.setupPixijs();
     this.pointList = [];
-/*
-        createjs.Ticker.setFPS(60);
-
-        createjs.Ticker.addEventListener("tick", this.stage);*/
 
   }
 
@@ -88,16 +85,12 @@ export class CanvasComponent implements OnInit
 
   createPoint(x : number , y : number)
   {
-    /*
-      var point = new Graphics();
-      point.beginFill(0xFFFF00);
-      point.drawEllipse(0, 0, 10, 10);
-      point.endFill();
-      point.x = x;
-      point.y = y;
-      this.app.stage.addChild(point);*/
+      this.pointList.push( new Point( this.tweenService , this.app.stage , new Vector2(x , y) ) );
+  }
 
-      this.pointList.push( new Point( this.tweenService , this.app.stage , x , y ) );
+  calculateGifWrapping()
+  {
+      var gf = new GiftWrappingService(this.pointList , this.app.stage);
   }
 
 
