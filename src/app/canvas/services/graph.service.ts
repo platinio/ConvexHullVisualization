@@ -7,38 +7,40 @@ export class GraphService
 {
 
     private stage: any;
-    private pos : Vector2;
-    private line : Graphics;
-    private fromSave : Vector2;
+
+
     constructor(private container : Container)
     {
 
     }
 
-    public drawLine(from : Vector2 , to : Vector2 )
+    public drawLine(from : Vector2 , to : Vector2  , size : number , color : any ) : any
     {
-        this.fromSave = from;
-        this.line = new Graphics();
-        this.line.x = 0;
-        this.line.y = 0;
-        this.line.lineStyle(5, 0xff0000);
-        this.line.moveTo(from.x , from.y);
-        this.pos = new Vector2( from.x , from.y );
 
-        createjs.Tween.get(this.pos).to({ x: to.x , y : to.y }, 1000 ).addEventListener("change", () => this.onChange() );
+        var line = new Graphics();
+        line.x = 0;
+        line.y = 0;
+        line.lineStyle(size, color);
+        line.moveTo(from.x , from.y);
+        var desirePos = new Vector2( from.x , from.y );
+
+        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, 1000 );
+
+        tween.addEventListener("change", () => {
+          line.moveTo(from.x , from.y);
+          line.lineTo(desirePos.x , desirePos.y);
+          this.container.addChild(line);
+        } );
+
+
 
         this.stage = new createjs.Stage("tweens");
         createjs.Ticker.setFPS(60);
         createjs.Ticker.addEventListener("tick", this.stage);
 
+        return tween;
     }
 
-    private onChange()
-    {
-        this.line.moveTo(this.fromSave.x , this.fromSave.y);
-        this.line.lineTo(this.pos.x , this.pos.y);
-        this.container.addChild(this.line);
-    }
 
     private calculatePointArray(from : Vector2 , to : Vector2) : any
     {

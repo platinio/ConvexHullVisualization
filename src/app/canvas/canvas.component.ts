@@ -54,7 +54,7 @@ export class CanvasComponent implements OnInit
 
         });
 
-        this.app.renderer.backgroundColor = 0x061639;
+        this.app.renderer.backgroundColor = 0x02a8a8;
 
       });
 
