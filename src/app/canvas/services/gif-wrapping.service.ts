@@ -13,23 +13,48 @@ export class GiftWrappingService
 
     constructor(private pointList : Point[] , private container : Container)
     {
+        //var startingPointIndex = this.getStartingPointIndex();
+        //var startingPoint = this.pointList[ startingPointIndex ];
 
+        var leftPoint = this.getLeftPoint();
 
-        var startingPointIndex = this.getStartingPointIndex();
-        var startingPoint = this.pointList[ startingPointIndex ];
         this.selectedPoints = [];
-        this.selectedPoints.push( startingPoint );
-        this.removeElementFromIndex( pointList , startingPointIndex );
+        this.selectedPoints.push( leftPoint );
+        this.removeValueFromArray( pointList , leftPoint );
+        //this.removeElementFromIndex( pointList , startingPointIndex );
 
         this.graph = new GraphService(this.container);
         this.tempPointList = this.pointList.slice();
         this.currentMinAnglePoint = null;
         this.findNextPoint();
-        /*
-        this.graph.drawLine( startingPoint.position , this.pickRandomPoint().position , 5 , 0xf5dea3 ).call( () =>
-        {
 
-        } );*/
+    }
+
+    private getLeftPoint() : Point
+    {
+        var result = this.pointList[0];
+
+        for(let n = 1 ; n < this.pointList.length ; n++)
+        {
+            if(this.pointList[n].position.x < result.position.x)
+            {
+                result = this.pointList[n];
+            }
+        }
+
+        return result;
+    }
+
+    private removeValueFromArray(array : any , value : any)
+    {
+        for(let n = 0 ; n < array.length ; n++)
+        {
+            if(array[n] == value)
+            {
+                array.splice(n , 1);
+                return;
+            }
+        }
     }
 
     private findNextPoint()
@@ -104,7 +129,7 @@ export class GiftWrappingService
 
                 this.selectedPoints.push( this.currentMinAnglePoint );
                 //this.removeElementFromIndex( this.pointList , this.currentMinAnglePointIndex );
-                this.removeElementFromValue(this.pointList , this.currentMinAnglePoint);
+                this.removeValueFromArray(this.pointList , this.currentMinAnglePoint);
                 this.tempPointList = this.pointList.slice();
                 this.currentMinAngle = 361;
 
@@ -117,34 +142,9 @@ export class GiftWrappingService
     }
 
 
-    private removeElementFromValue(array : any , element : any)
-    {
-        for(let n = 0 ; n < array.length ; n++)
-        {
-            if(array[n] == element)
-            {
-                array.splice(n , 1);
-                return;
-            }
-        }
-    }
 
-    private getStartingPointIndex() : number
-    {
-        var result = this.pointList[0].position;
-        var index = 0;
 
-        for(let n = 1 ; n < this.pointList.length ; n++)
-        {
-            if(this.pointList[n].position.x < result.x)
-            {
-                result = this.pointList[n].position;
-                index = n;
-            }
-        }
 
-        return index;
-    }
 
     private pickRandomIndex(array : any) : number
     {
