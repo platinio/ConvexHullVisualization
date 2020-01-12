@@ -9,7 +9,7 @@ export class GiftWrappingService
     private selectedPoints : Point[];
     private tempPointList : Point[];
     private currentMinAnglePoint : Point = null;
-    private currentMinAngle : number = 361;
+    private currentMinAngle : number = 0;
 
     constructor(private pointList : Point[] , private container : Container)
     {
@@ -68,8 +68,7 @@ export class GiftWrappingService
     {
         this.graph = new GraphService(this.container);
 
-        this.tempPointList = this.pointList.slice();
-        this.currentMinAnglePoint = null;
+        this.resetValuesForReuse();
         this.findNextPoint();
     }
 
@@ -92,40 +91,47 @@ export class GiftWrappingService
             }
             else
             {
-
-                this.graph.drawLine( lastSelectedPoint.position , this.currentMinAnglePoint.position , 5 , 0xf5dea3 ).call( () => {
-
-                  if(this.tempPointList.length > 0)
-                  {
-                      //this.currentMinAnglePoint = null;
-                      this.currentMinAngle = 361;
-
-                      if(this.selectedPoints[ this.selectedPoints.length - 1 ] != this.selectedPoints[ 0 ])
-                          this.findNextPoint();
-                  }
-
-
-                } );
-
-                //insert starting point in the avalible points after use it
-                if(this.selectedPoints.length == 1)
-                {
-                    this.pointList.push( this.selectedPoints[0] );
-                }
-                //set point as selected
-                //this.selectedPoints.push( this.currentMinAnglePoint );
-                //this.removeValueFromArray(this.pointList , this.currentMinAnglePoint);
-                this.markPointAsSelected( this.currentMinAnglePoint );
-
-                this.tempPointList = this.pointList.slice();
-                this.currentMinAngle = 361;
-
-
+                this.processPointSelected(lastSelectedPoint);
             }
 
+        } );
+    }
 
+    private processPointSelected( selectedPoint : Point )
+    {
+        this.graph.drawLine( selectedPoint.position , this.currentMinAnglePoint.position , 5 , 0xf5dea3 ).call( () => {
+
+          //if convex hull is no complete keep going
+          if( !this.convexHullIsComplete() )
+          {
+              this.findNextPoint();
+          }
 
         } );
+
+        this.insertStartingPointInAvaliblePointsIfNecesary();
+        this.markPointAsSelected( this.currentMinAnglePoint );
+        this.resetValuesForReuse();
+    }
+
+    private insertStartingPointInAvaliblePointsIfNecesary()
+    {
+        //insert starting point in the avalible points after use it
+        if(this.selectedPoints.length == 1)
+        {
+            this.pointList.push( this.selectedPoints[0] );
+        }
+    }
+
+    private resetValuesForReuse()
+    {
+        this.currentMinAnglePoint = null;
+        this.tempPointList = this.pointList.slice();
+    }
+
+    private convexHullIsComplete() : boolean
+    {
+        return this.selectedPoints[ this.selectedPoints.length - 1 ] == this.selectedPoints[ 0 ];
     }
 
     private haveMorePointsToCheck() : boolean
