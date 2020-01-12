@@ -13,21 +13,17 @@ export class GiftWrappingService
 
     constructor(private pointList : Point[] , private container : Container)
     {
-        //var startingPointIndex = this.getStartingPointIndex();
-        //var startingPoint = this.pointList[ startingPointIndex ];
+        //pick a starting point for the gift wrapping
+        this.pickStartingPoint();
+        //initialize and start the gift wrapping
+        this.initializeGiftWrapping();
+    }
 
+    private pickStartingPoint()
+    {
+        //find a starting point
         var leftPoint = this.getLeftPoint();
-
-        this.selectedPoints = [];
-        this.selectedPoints.push( leftPoint );
-        this.removeValueFromArray( pointList , leftPoint );
-        //this.removeElementFromIndex( pointList , startingPointIndex );
-
-        this.graph = new GraphService(this.container);
-        this.tempPointList = this.pointList.slice();
-        this.currentMinAnglePoint = null;
-        this.findNextPoint();
-
+        this.markPointAsSelected( leftPoint );
     }
 
     private getLeftPoint() : Point
@@ -45,6 +41,17 @@ export class GiftWrappingService
         return result;
     }
 
+    private markPointAsSelected(point : Point)
+    {
+        if(this.selectedPoints == null)
+        {
+            this.selectedPoints = [];
+        }
+
+        this.selectedPoints.push( point );
+        this.removeValueFromArray( this.pointList , point );
+    }
+
     private removeValueFromArray(array : any , value : any)
     {
         for(let n = 0 ; n < array.length ; n++)
@@ -55,6 +62,15 @@ export class GiftWrappingService
                 return;
             }
         }
+    }
+
+    private initializeGiftWrapping()
+    {
+        this.graph = new GraphService(this.container);
+
+        this.tempPointList = this.pointList.slice();
+        this.currentMinAnglePoint = null;
+        this.findNextPoint();
     }
 
     private findNextPoint()
