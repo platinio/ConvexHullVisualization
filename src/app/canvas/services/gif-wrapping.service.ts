@@ -75,44 +75,14 @@ export class GiftWrappingService
 
     private findNextPoint()
     {
-        var selectedPoint = this.selectedPoints[ this.selectedPoints.length - 1 ];
-        var randomSelectedIndex = this.pickRandomIndex(this.tempPointList);
-        var randomSelected = this.tempPointList[ randomSelectedIndex ];
+        var lastSelectedPoint = this.getLastSelectedPoint();
+        var randomSelectedPoint = this.pickRandomElementFromArray(this.tempPointList);
 
-        this.removeElementFromIndex( this.tempPointList , randomSelectedIndex );
+        this.removeValueFromArray(this.tempPointList , randomSelectedPoint);
 
-
-
-        this.graph.drawLine( selectedPoint.position , randomSelected.position , 5 , 0xf5dea3 ).call( () =>
+        this.graph.drawLine( lastSelectedPoint.position , randomSelectedPoint.position , 5 , 0xf5dea3 ).call( () =>
         {
-            var dir = this.getDirection( selectedPoint.position , randomSelected.position );
-            var axis = new Vector2(1 , 0);
-
-            if(this.selectedPoints.length > 1)
-            {
-
-                axis = this.getDirection( this.selectedPoints[ this.selectedPoints.length - 2 ].position , this.selectedPoints[ this.selectedPoints.length - 1 ].position );
-                axis = new Vector2( axis.y , axis.x * -1 );
-                //axis.x = axis.x * -1;
-                //axis.y = axis.y * -1;
-
-            }
-
-            var angle = this.calculateAngle( dir , axis );
-            //angle = Math.abs(angle);
-            console.log("angle " + angle);
-
-
-            if( angle < this.currentMinAngle || this.currentMinAnglePoint == null)
-            {
-              //console.log( "update min angle " + this.currentMinAngle + " new " +  angle);
-
-              //if(this.currentMinAnglePoint == null)
-              //    console.log("current point was null");
-
-              this.currentMinAnglePoint = randomSelected;
-              this.currentMinAngle = angle;
-            }
+            this.checkPointAngle( lastSelectedPoint , randomSelectedPoint );
 
             this.graph.clearLastGraphic();
 
@@ -124,7 +94,7 @@ export class GiftWrappingService
             else
             {
 
-                this.graph.drawLine( selectedPoint.position , this.currentMinAnglePoint.position , 5 , 0xf5dea3 ).call( () => {
+                this.graph.drawLine( lastSelectedPoint.position , this.currentMinAnglePoint.position , 5 , 0xf5dea3 ).call( () => {
 
                   if(this.tempPointList.length > 0)
                   {
@@ -157,10 +127,47 @@ export class GiftWrappingService
         } );
     }
 
+    private checkPointAngle( lastSelectedPoint : Point , randomSelectedPoint : Point )
+    {
+        var dir = this.getDirection( lastSelectedPoint.position , randomSelectedPoint.position );
+        var axis = this.calculateAxisAngle();
+        var angle = this.calculateAngle( dir , axis );
 
 
+        if( this.shouldReplaceCurrentMinAngle(angle) )
+        {
+            this.currentMinAnglePoint = randomSelectedPoint;
+            this.currentMinAngle = angle;
+        }
+    }
 
+    private calculateAxisAngle() : Vector2
+    {
+        var axis = new Vector2(1 , 0);
 
+        if(this.selectedPoints.length > 1)
+        {
+            axis = this.getDirection( this.selectedPoints[ this.selectedPoints.length - 2 ].position , this.selectedPoints[ this.selectedPoints.length - 1 ].position );
+            axis = new Vector2( axis.y , axis.x * -1 );
+        }
+
+        return axis;
+    }
+
+    private shouldReplaceCurrentMinAngle(angle : number)
+    {
+        return angle < this.currentMinAngle || this.currentMinAnglePoint == null;
+    }
+
+    private pickRandomElementFromArray(array : any) : any
+    {
+        return array[ this.pickRandomIndex(array) ];
+    }
+
+    private getLastSelectedPoint()  : Point
+    {
+        return this.selectedPoints[ this.selectedPoints.length - 1 ];
+    }
 
     private pickRandomIndex(array : any) : number
     {
