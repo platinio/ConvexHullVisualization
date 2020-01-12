@@ -6,15 +6,25 @@ export class GiftWrappingService
 {
 
     private graph : GraphService;
+    private selectedPoints : Point[];
+    private tempPointList : Point[];
+    private currentMinAnglePoint : Point = null;
+    private currentMinAngle : number = 361;
 
     constructor(private pointList : Point[] , private container : Container)
     {
+
+
         var startingPointIndex = this.getStartingPointIndex();
         var startingPoint = this.pointList[ startingPointIndex ];
-        this.removePointFromIndex( startingPointIndex );
+        this.selectedPoints = [];
+        this.selectedPoints.push( startingPoint );
+        this.removeElementFromIndex( pointList , startingPointIndex );
 
         this.graph = new GraphService(this.container);
-        findNextPoint();
+        this.tempPointList = this.pointList.slice();
+        this.currentMinAnglePoint = null;
+        this.findNextPoint();
         /*
         this.graph.drawLine( startingPoint.position , this.pickRandomPoint().position , 5 , 0xf5dea3 ).call( () =>
         {
@@ -24,7 +34,99 @@ export class GiftWrappingService
 
     private findNextPoint()
     {
+        var selectedPoint = this.selectedPoints[ this.selectedPoints.length - 1 ];
+        var randomSelectedIndex = this.pickRandomIndex(this.tempPointList);
+        var randomSelected = this.tempPointList[ randomSelectedIndex ];
 
+        this.removeElementFromIndex( this.tempPointList , randomSelectedIndex );
+
+
+
+        this.graph.drawLine( selectedPoint.position , randomSelected.position , 5 , 0xf5dea3 ).call( () =>
+        {
+            var dir = this.getDirection( selectedPoint.position , randomSelected.position );
+            var axis = new Vector2(1 , 0);
+
+            if(this.selectedPoints.length > 1)
+            {
+
+                axis = this.getDirection( this.selectedPoints[ this.selectedPoints.length - 2 ].position , this.selectedPoints[ this.selectedPoints.length - 1 ].position );
+                axis = new Vector2( axis.y , axis.x * -1 );
+                //axis.x = axis.x * -1;
+                //axis.y = axis.y * -1;
+
+            }
+
+            var angle = this.calculateAngle( dir , axis );
+            //angle = Math.abs(angle);
+            console.log("angle " + angle);
+
+
+            if( angle < this.currentMinAngle || this.currentMinAnglePoint == null)
+            {
+              //console.log( "update min angle " + this.currentMinAngle + " new " +  angle);
+
+              //if(this.currentMinAnglePoint == null)
+              //    console.log("current point was null");
+
+              this.currentMinAnglePoint = randomSelected;
+              this.currentMinAngle = angle;
+            }
+
+            this.graph.clearLastGraphic();
+
+            if(this.tempPointList.length > 0)
+            {
+
+                this.findNextPoint();
+            }
+            else
+            {
+
+                this.graph.drawLine( selectedPoint.position , this.currentMinAnglePoint.position , 5 , 0xf5dea3 ).call( () => {
+
+                  if(this.tempPointList.length > 0)
+                  {
+                      //this.currentMinAnglePoint = null;
+                      this.currentMinAngle = 361;
+
+                      if(this.selectedPoints[ this.selectedPoints.length - 1 ] != this.selectedPoints[ 0 ])
+                          this.findNextPoint();
+                  }
+
+
+                } );
+
+                if(this.selectedPoints.length == 1)
+                {
+                    this.pointList.push( this.selectedPoints[0] );
+                }
+
+                this.selectedPoints.push( this.currentMinAnglePoint );
+                //this.removeElementFromIndex( this.pointList , this.currentMinAnglePointIndex );
+                this.removeElementFromValue(this.pointList , this.currentMinAnglePoint);
+                this.tempPointList = this.pointList.slice();
+                this.currentMinAngle = 361;
+
+
+            }
+
+
+
+        } );
+    }
+
+
+    private removeElementFromValue(array : any , element : any)
+    {
+        for(let n = 0 ; n < array.length ; n++)
+        {
+            if(array[n] == element)
+            {
+                array.splice(n , 1);
+                return;
+            }
+        }
     }
 
     private getStartingPointIndex() : number
@@ -44,9 +146,9 @@ export class GiftWrappingService
         return index;
     }
 
-    private pickRandomPoint() : Point
+    private pickRandomIndex(array : any) : number
     {
-        return this.pointList[ this.getRandomInt(0 , this.pointList.length) ];
+        return this.getRandomInt(0 , array.length);
     }
 
     private getRandomInt(min, max) : number
@@ -54,14 +156,33 @@ export class GiftWrappingService
         return Math.floor(Math.random() * (max - min)) + min;
     }
 
-    private removePointFromIndex(index : number)
+    private removeElementFromIndex(array : any , index : number) : any
     {
-        return this.pointList.splice(index , 1);
+        return array.splice(index , 1);
     }
 
-    private calculateCrossProduct( p1 : Point , p2 : Point )
+    private calculateCrossProduct( p1 : Vector2 , p2 : Vector2 )
     {
-        return (p2.position.y * p1.position.x) - ( p1.position.y * p2.position.x );
+        return (p2.y * p1.x) - ( p1.y * p2.x );
+    }
+
+    private calculateMagnitude(v : Vector2) : number
+    {
+        return Math.sqrt( Math.pow( v.x , 2 ) + Math.pow( v.y , 2 ) );
+    }
+
+    private calculateAngle(from : Vector2 , to : Vector2) : number
+    {
+        var v = ( this.calculateCrossProduct( from , to ) / (this.calculateMagnitude(from) * this.calculateMagnitude(to)) );
+        return Math.asin(v) * (180 / Math.PI);
+    }
+
+    private getDirection(from : Vector2 , to : Vector2) : Vector2
+    {
+        var dir = new Vector2( from.x - to.x , from.y - to.y );
+        var m = Math.sqrt( Math.pow( dir.x , 2 ) + Math.pow( dir.y , 2 ) );
+
+        return new Vector2( dir.x / m , dir.y / m );
     }
 
 }

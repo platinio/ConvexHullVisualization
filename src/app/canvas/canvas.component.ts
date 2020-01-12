@@ -80,7 +80,7 @@ export class CanvasComponent implements OnInit
 
       this.createPoint(point.x , point.y);
       //this.createPoint(x , y);
-      console.log(e);
+
   }
 
   createPoint(x : number , y : number)

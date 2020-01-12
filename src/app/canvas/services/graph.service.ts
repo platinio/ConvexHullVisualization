@@ -7,6 +7,7 @@ export class GraphService
 {
 
     private stage: any;
+    private graphicList : Graphics[] = [];
 
 
     constructor(private container : Container)
@@ -18,13 +19,14 @@ export class GraphService
     {
 
         var line = new Graphics();
+        this.graphicList.push( line );
         line.x = 0;
         line.y = 0;
         line.lineStyle(size, color);
         line.moveTo(from.x , from.y);
         var desirePos = new Vector2( from.x , from.y );
 
-        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, 1000 );
+        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, 100 );
 
         tween.addEventListener("change", () => {
           line.moveTo(from.x , from.y);
@@ -38,9 +40,23 @@ export class GraphService
         createjs.Ticker.setFPS(60);
         createjs.Ticker.addEventListener("tick", this.stage);
 
+        this.graphicList.push(line);
+
         return tween;
     }
 
+    public clearLastGraphic()
+    {
+        var g = this.graphicList.pop();
+
+        //this.container.removeChild( g );
+        g.clear();
+    }
+
+    public getLastGraphic() : Graphics
+    {
+        return this.graphicList.pop();
+    }
 
     private calculatePointArray(from : Vector2 , to : Vector2) : any
     {
