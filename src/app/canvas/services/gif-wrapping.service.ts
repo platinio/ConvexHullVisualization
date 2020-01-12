@@ -86,9 +86,8 @@ export class GiftWrappingService
 
             this.graph.clearLastGraphic();
 
-            if(this.tempPointList.length > 0)
+            if( this.haveMorePointsToCheck() )
             {
-
                 this.findNextPoint();
             }
             else
@@ -108,14 +107,16 @@ export class GiftWrappingService
 
                 } );
 
+                //insert starting point in the avalible points after use it
                 if(this.selectedPoints.length == 1)
                 {
                     this.pointList.push( this.selectedPoints[0] );
                 }
+                //set point as selected
+                //this.selectedPoints.push( this.currentMinAnglePoint );
+                //this.removeValueFromArray(this.pointList , this.currentMinAnglePoint);
+                this.markPointAsSelected( this.currentMinAnglePoint );
 
-                this.selectedPoints.push( this.currentMinAnglePoint );
-                //this.removeElementFromIndex( this.pointList , this.currentMinAnglePointIndex );
-                this.removeValueFromArray(this.pointList , this.currentMinAnglePoint);
                 this.tempPointList = this.pointList.slice();
                 this.currentMinAngle = 361;
 
@@ -127,18 +128,27 @@ export class GiftWrappingService
         } );
     }
 
+    private haveMorePointsToCheck() : boolean
+    {
+        return this.tempPointList.length > 0
+    }
+
     private checkPointAngle( lastSelectedPoint : Point , randomSelectedPoint : Point )
     {
-        var dir = this.getDirection( lastSelectedPoint.position , randomSelectedPoint.position );
-        var axis = this.calculateAxisAngle();
-        var angle = this.calculateAngle( dir , axis );
-
+        var angle = this.calculateLocalAngle( lastSelectedPoint , randomSelectedPoint );
 
         if( this.shouldReplaceCurrentMinAngle(angle) )
         {
             this.currentMinAnglePoint = randomSelectedPoint;
             this.currentMinAngle = angle;
         }
+    }
+
+    private calculateLocalAngle(from : Point , to : Point) : number
+    {
+        var dir = this.getDirection( from.position , to.position );
+        var axis = this.calculateAxisAngle();
+        return this.calculateAngle( dir , axis );
     }
 
     private calculateAxisAngle() : Vector2
