@@ -149,7 +149,7 @@ export class GiftWrappingService
         //var dir = this.getDirection( from.position , to.position );
         var dir = from.position.dirTo( to.position );
         var axis = this.calculateAxisAngle(); //get the local axis
-        return this.calculateAngle( dir , axis ); //calculate the angle base on the local axis
+        return dir.angleTo(axis);
     }
 
     //get the local point position axis
@@ -159,44 +159,14 @@ export class GiftWrappingService
 
         if(this.selectedPoints.length > 1)
         {
-            //axis = this.getDirection( this.selectedPoints[ this.selectedPoints.length - 2 ].position , this.selectedPoints[ this.selectedPoints.length - 1 ].position );
             var from = this.selectedPoints[ this.selectedPoints.length - 2 ].position;
             var to = this.selectedPoints[ this.selectedPoints.length - 1 ].position;
             axis = from.dirTo( to );
-            axis = new Vector2( axis.y , axis.x * -1 );
+            axis = axis.perpendicular;
         }
 
         return axis;
     }
-
-    /*
-    private getDirection(from : Vector2 , to : Vector2) : Vector2
-    {
-        //get the direction
-        var dir = new Vector2( from.x - to.x , from.y - to.y );
-        var m = this.getVectorMagnitude(dir); //calculate the magnitude
-
-        return new Vector2( dir.x / m , dir.y / m ); //normalize the vector
-    }
-
-    private getVectorMagnitude(v : Vector2)
-    {
-        return Math.sqrt( Math.pow( v.x , 2 ) + Math.pow( v.y , 2 ) );
-    }*/
-
-    private calculateAngle(from : Vector2 , to : Vector2) : number
-    {
-        //var v = ( this.calculateCrossProduct( from , to ) / (this.getVectorMagnitude(from) * this.getVectorMagnitude(to)) );
-        var v = ( this.calculateCrossProduct( from , to ) / ( from.magnitude * to.magnitude ) );
-        return Math.asin(v) * (180 / Math.PI);
-    }
-
-
-    private calculateCrossProduct( p1 : Vector2 , p2 : Vector2 )
-    {
-        return (p2.y * p1.x) - ( p1.y * p2.x );
-    }
-
 
     private haveMorePointsToCheck() : boolean
     {

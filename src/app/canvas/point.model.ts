@@ -31,6 +31,16 @@ export class Point
 
 export class Vector2
 {
+    get magnitude() : number
+    {
+        return Math.sqrt( Math.pow( this.x , 2 ) + Math.pow( this.y , 2 ) );
+    }
+
+    get perpendicular() : Vector2
+    {
+        return new Vector2( this.y , this.x * -1 )
+    }
+
     constructor(public x : number , public y : number)
     {
 
@@ -45,9 +55,15 @@ export class Vector2
         return new Vector2( dir.x / m , dir.y / m ); //normalize the vector
     }
 
-    get magnitude() : number
+    public angleTo(to : Vector2)
     {
-        return Math.sqrt( Math.pow( this.x , 2 ) + Math.pow( this.y , 2 ) );
+        var v = ( this.getcrossProduct(to) / ( this.magnitude * to.magnitude ) );
+        return Math.asin(v) * (180 / Math.PI);
+    }
+
+    public getcrossProduct( v : Vector2 ) : number
+    {
+        return (v.y * this.x) - ( this.y * v.x );
     }
 
 }
