@@ -1,6 +1,6 @@
 import { Point , Vector2 } from '../point.model';
 import { GraphService } from './graph.service';
-import { Container } from 'pixi.js';
+import { Container , Graphics } from 'pixi.js';
 
 export class GiftWrappingService
 {
@@ -10,6 +10,8 @@ export class GiftWrappingService
     private tempPointList : Point[];
     private currentMinAnglePoint : Point = null;
     private currentMinAngle : number = 0;
+    private currentMinAngleLine : Graphics = null;
+    private activeLines : Graphics[] = [];
 
     constructor(private pointList : Point[] , private container : Container)
     {
@@ -88,13 +90,15 @@ export class GiftWrappingService
         this.removeValueFromArray(this.tempPointList , randomSelectedPoint);
 
         //draw a line to the random selected point
-        this.graph.drawLine( lastSelectedPoint.position , randomSelectedPoint.position , 5 , 0xf5dea3 ).call( () =>
+        var result = this.graph.drawLine( lastSelectedPoint.position , randomSelectedPoint.position , 5 , 0xf5dea3 );
+        result[0].call( () =>
         {
             //check if we should override the current selected point base on the local angle
             this.checkPointAngle( lastSelectedPoint , randomSelectedPoint );
 
             //clear the last draw line
-            this.graph.clearLastGraphic();
+            //this.graph.clearLastGraphic();
+            result[1].clear();
 
             //still have more temp points to check?
             if( this.haveMorePointsToCheck() )
@@ -106,6 +110,8 @@ export class GiftWrappingService
                 //we found the most left local point process it
                 this.processPointSelected(lastSelectedPoint);
             }
+
+
 
         } );
     }
@@ -140,6 +146,14 @@ export class GiftWrappingService
         {
             this.currentMinAnglePoint = randomSelectedPoint;
             this.currentMinAngle = angle;
+
+            if(this.currentMinAngleLine != null)
+            {
+                this.currentMinAngleLine.clear();
+            }
+
+            this.currentMinAngleLine = this.graph.drawLine( lastSelectedPoint.position , randomSelectedPoint.position , 5 , 0xe89da2 )[1];
+
         }
     }
 
@@ -180,8 +194,10 @@ export class GiftWrappingService
 
     private processPointSelected( selectedPoint : Point )
     {
-        this.graph.drawLine( selectedPoint.position , this.currentMinAnglePoint.position , 5 , 0xf5dea3 ).call( () => {
+        var result = this.graph.drawLine( selectedPoint.position , this.currentMinAnglePoint.position , 5 , 0xf5dea3 );
+        result[0].call( () => {
 
+          this.activeLines.push( result[1] );
           //if convex hull is no complete keep going
           if( !this.convexHullIsComplete() )
           {

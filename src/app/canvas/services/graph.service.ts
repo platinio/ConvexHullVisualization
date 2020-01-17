@@ -26,7 +26,7 @@ export class GraphService
         line.moveTo(from.x , from.y);
         var desirePos = new Vector2( from.x , from.y );
 
-        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, 100 );
+        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, 120 );
 
         tween.addEventListener("change", () => {
           line.moveTo(from.x , from.y);
@@ -42,7 +42,8 @@ export class GraphService
 
         this.graphicList.push(line);
 
-        return tween;
+        //return {tween: tween , line: line };
+        return [tween , line];
     }
 
     public clearLastGraphic()
