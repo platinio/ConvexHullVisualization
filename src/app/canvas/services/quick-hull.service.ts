@@ -7,9 +7,10 @@ export class QuickHullService extends ConvexHull
 {
     private selectedPoints : Point[] = null;
 
-    constructor(pointList : Point[] , private container : Container)
+    constructor(pointList : Point[] , private container : Container , speed : number)
     {
         super();
+        this.speed = speed;
         this.graph = new GraphService(this.container);
         this.pointList = pointList.slice();
         var points = this.pickStartingLine();
@@ -28,14 +29,14 @@ export class QuickHullService extends ConvexHull
     {
         var lastSelectedPoints = this.getLastSelectedPoints();
 
-        var result = this.graph.drawLine( lastSelectedPoints[0].position , lastSelectedPoints[1].position , 5 , 0xf5dea3 );
+        var result = this.graph.drawLine( lastSelectedPoints[0].position , lastSelectedPoints[1].position , 5 , 0xf5dea3 , this.speed  );
         result[0].call( () =>
         {
             var midPoint = this.calculateMidPoint( lastSelectedPoints[0].position , lastSelectedPoints[1].position );
-            var maxDistancePoint = this.getMaxDistancePoint( lastSelectedPoints[0].position , lastSelectedPoints[1].position );
+            var maxDistancePoint = this.getMaxDistancePoint( midPoint );
 
-            this.graph.drawLine( lastSelectedPoints[0].position , maxDistancePoint.position , 5 , 0xf5dea3 );
-            this.graph.drawLine( lastSelectedPoints[1].position , maxDistancePoint.position , 5 , 0xf5dea3 );
+            this.graph.drawLine( lastSelectedPoints[0].position , maxDistancePoint.position , 5 , 0xf5dea3 , this.speed  );
+            this.graph.drawLine( lastSelectedPoints[1].position , maxDistancePoint.position , 5 , 0xf5dea3 , this.speed  );
 
         } );
     }
@@ -94,14 +95,14 @@ export class QuickHullService extends ConvexHull
         return new Vector2( (a.x + b.x) / 2 , ( a.y + b.y ) / 2 );
     }
 
-    private getMaxDistancePoint(left : Vector2 , right : Vector2) : Point
+    private getMaxDistancePoint(p : Vector2 ) : Point
     {
         var closerPoint = null;
         var maxDistance = -99999;
 
         for(let n = 0 ; n < this.pointList.length ; n++)
         {
-            var distance = this.pointList[n].position.getDistance( left ) + this.pointList[n].position.getDistance( right );
+            var distance = this.pointList[n].position.getDistance( p );
             if( distance > maxDistance )
             {
                 closerPoint = this.pointList[n];

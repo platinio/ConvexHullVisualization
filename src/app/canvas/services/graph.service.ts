@@ -15,7 +15,7 @@ export class GraphService
 
     }
 
-    public drawLine(from : Vector2 , to : Vector2  , size : number , color : any ) : any
+    public drawLine(from : Vector2 , to : Vector2  , size : number , color : any , t : number ) : any
     {
 
         var line = new Graphics();
@@ -26,7 +26,7 @@ export class GraphService
         line.moveTo(from.x , from.y);
         var desirePos = new Vector2( from.x , from.y );
 
-        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, 120 );
+        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, t * 100 );
 
         tween.addEventListener("change", () => {
           line.moveTo(from.x , from.y);

@@ -7,11 +7,17 @@ export abstract class ConvexHull
     protected graph : GraphService; //helper for drawing
     protected pointList : Point[] = [];
     protected stopped : boolean = false;
+    protected speed : number = 1;
 
     abstract clearAllLines();
-    
+
     public stop()
     {
         this.stopped = true;
+    }
+
+    public setSpeed(speed : number)
+    {
+        this.speed = speed;
     }
 }

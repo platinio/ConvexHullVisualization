@@ -14,10 +14,11 @@ export class GiftWrappingService extends ConvexHull
     private activeLines : Graphics[] = [];
 
 
-    constructor(pointList : Point[] , private container : Container)
+    constructor(pointList : Point[] , private container : Container , speed : number)
     {
         super();
 
+        this.speed = speed;
         this.pointList = pointList.slice();
 
         //pick a starting point for the gift wrapping
@@ -98,7 +99,7 @@ export class GiftWrappingService extends ConvexHull
         this.removeValueFromArray(this.tempPointList , randomSelectedPoint);
 
         //draw a line to the random selected point
-        var result = this.graph.drawLine( lastSelectedPoint.position , randomSelectedPoint.position , 5 , 0xf5dea3 );
+        var result = this.graph.drawLine( lastSelectedPoint.position , randomSelectedPoint.position , 5 , 0xf5dea3 , this.speed );
         result[0].call( () =>
         {
             //check if we should override the current selected point base on the local angle
@@ -160,7 +161,7 @@ export class GiftWrappingService extends ConvexHull
                 this.currentMinAngleLine.clear();
             }
 
-            this.currentMinAngleLine = this.graph.drawLine( lastSelectedPoint.position , randomSelectedPoint.position , 5 , 0xe89da2 )[1];
+            this.currentMinAngleLine = this.graph.drawLine( lastSelectedPoint.position , randomSelectedPoint.position , 5 , 0xe89da2 , this.speed  )[1];
 
         }
     }
@@ -202,7 +203,7 @@ export class GiftWrappingService extends ConvexHull
 
     private processPointSelected( selectedPoint : Point )
     {
-        var result = this.graph.drawLine( selectedPoint.position , this.currentMinAnglePoint.position , 5 , 0xf5dea3 );
+        var result = this.graph.drawLine( selectedPoint.position , this.currentMinAnglePoint.position , 5 , 0xf5dea3 , this.speed  );
         result[0].call( () => {
 
           this.activeLines.push( result[1] );

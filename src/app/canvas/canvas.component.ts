@@ -27,6 +27,7 @@ export class CanvasComponent implements OnInit
   private minRandomPoints : number = 20;
   private maxRandomPoints : number = 40;
   private randomSpawnPointMargin : Vector2 = new Vector2(400 , 200);
+  private speed : number = 1;
 
   //ellipse : Graphics;
   //coords = { x: 0, y: 0 };
@@ -102,7 +103,7 @@ export class CanvasComponent implements OnInit
           this.giftWrapping.stop();
       }
 
-      this.giftWrapping = new GiftWrappingService(this.pointList , this.app.stage);
+      this.giftWrapping = new GiftWrappingService(this.pointList , this.app.stage , this.speed);
   }
 
   public calculateQuickHull()
@@ -113,7 +114,7 @@ export class CanvasComponent implements OnInit
           this.quickHull.stop();
       }
 
-      this.quickHull = new QuickHullService( this.pointList , this.app.stage );
+      this.quickHull = new QuickHullService( this.pointList , this.app.stage , this.speed );
   }
 
   public clearCanvas()
@@ -148,6 +149,21 @@ export class CanvasComponent implements OnInit
   private getRandomInt(min, max) : number
   {
       return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  public onSpeedChange(value : number)
+  {
+      this.speed = value;
+
+      if(this.giftWrapping != null)
+      {
+          this.giftWrapping.setSpeed( this.speed );
+      }
+
+      if(this.quickHull != null)
+      {
+          this.quickHull.setSpeed( this.speed );
+      }
   }
 
 
