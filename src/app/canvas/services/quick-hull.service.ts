@@ -1,4 +1,5 @@
 import { Point , Vector2 } from '../point.model';
+import { Line } from '../line.model';
 import { GraphService } from './graph.service';
 import { Container , Graphics } from 'pixi.js';
 import { ConvexHull } from './convex-hull';
@@ -6,6 +7,8 @@ import { ConvexHull } from './convex-hull';
 export class QuickHullService extends ConvexHull
 {
     private selectedPoints : Point[] = null;
+    private selectedLines : [] = [];
+    private convexHull : Line[] = [];
 
     constructor(pointList : Point[] , private container : Container , speed : number)
     {
@@ -17,6 +20,7 @@ export class QuickHullService extends ConvexHull
 
         this.markPointAsSelected( points[0] );
         this.markPointAsSelected( points[1] );
+        this.convexHull.push( new Line( points[0].position , points[1].position ) );
         this.findNextLine();
     }
 
@@ -35,10 +39,35 @@ export class QuickHullService extends ConvexHull
             var midPoint = this.calculateMidPoint( lastSelectedPoints[0].position , lastSelectedPoints[1].position );
             var maxDistancePoint = this.getMaxDistancePoint( midPoint );
 
+            var leftLine = new Line( lastSelectedPoints[0].position , maxDistancePoint.position );
+            var rightLine = new Line( lastSelectedPoints[1].position , maxDistancePoint.position );
+
+            this.convexHull.push( leftLine );
+            this.convexHull.push( rightLine );
+
             this.graph.drawLine( lastSelectedPoints[0].position , maxDistancePoint.position , 5 , 0xf5dea3 , this.speed  );
             this.graph.drawLine( lastSelectedPoints[1].position , maxDistancePoint.position , 5 , 0xf5dea3 , this.speed  );
 
+            this.markPointAsSelected( maxDistancePoint );
+
+            this.removePointsInsideConvexHull();
+
         } );
+    }
+
+    private removePointsInsideConvexHull()
+    {
+
+        for(let n = 0 ; n < this.pointList.length ; n++)
+        {
+            if( Line.isInside( this.convexHull , this.pointList[n].position ) )
+            {
+
+                this.pointList[n].clear();
+                this.removeValueFromArray( this.pointList , this.pointList[n] );
+                n--;
+            }
+        }
     }
 
     private getLastSelectedPoints() : Point[]
@@ -112,5 +141,7 @@ export class QuickHullService extends ConvexHull
 
         return closerPoint;
     }
+
+
 
 }
