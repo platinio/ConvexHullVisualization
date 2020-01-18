@@ -3,6 +3,7 @@ import { Application , Graphics } from 'pixi.js';
 import { Point , Vector2 } from './point.model';
 import { TweenService } from './services/tween.service';
 import { GiftWrappingService } from './services/gif-wrapping.service';
+import { QuickHullService } from './services/quick-hull.service';
 
 
 
@@ -22,6 +23,7 @@ export class CanvasComponent implements OnInit
   private screenSize = {x: 2048 , y: 1024};
   private pointList : Point[];
   private giftWrapping : GiftWrappingService = null;
+  private quickHull : QuickHullService = null;
   private minRandomPoints : number = 20;
   private maxRandomPoints : number = 40;
   private randomSpawnPointMargin : Vector2 = new Vector2(400 , 200);
@@ -105,7 +107,13 @@ export class CanvasComponent implements OnInit
 
   public calculateQuickHull()
   {
-      
+      if(this.quickHull != null)
+      {
+          this.quickHull.clearAllLines();
+          this.quickHull.stop();
+      }
+
+      this.quickHull = new QuickHullService( this.pointList , this.app.stage );
   }
 
   public clearCanvas()

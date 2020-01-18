@@ -72,4 +72,9 @@ export class Vector2
         return (v.y * this.x) - ( this.y * v.x );
     }
 
+    public getDistance(v : Vector2) : number
+    {
+        return Math.sqrt( Math.pow( v.x - this.x , 2 ) + Math.pow( v.y - this.y , 2 ) );
+    }
+
 }
