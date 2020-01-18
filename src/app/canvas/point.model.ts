@@ -27,6 +27,12 @@ export class Point
         this.container.addChild(this.sprite);
         tweenService.scaleTween(this.sprite.scale , this.desireScale , this.scaleTime);
     }
+
+    public clear()
+    {
+        this.tweenService.scaleTween(this.sprite.scale , new Vector2(0 , 0) , this.scaleTime).call( () => { this.sprite.destroy(); } );
+
+    }
 }
 
 export class Vector2

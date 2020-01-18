@@ -21,6 +21,10 @@ export class CanvasComponent implements OnInit
 
   private screenSize = {x: 2048 , y: 1024};
   private pointList : Point[];
+  private giftWrapping : GiftWrappingService = null;
+  private minRandomPoints : number = 20;
+  private maxRandomPoints : number = 40;
+  private randomSpawnPointMargin : Vector2 = new Vector2(400 , 200);
 
   //ellipse : Graphics;
   //coords = { x: 0, y: 0 };
@@ -88,9 +92,54 @@ export class CanvasComponent implements OnInit
       this.pointList.push( new Point( this.tweenService , this.app.stage , new Vector2(x , y) ) );
   }
 
-  calculateGifWrapping()
+  public calculateGifWrapping()
   {
-      var gf = new GiftWrappingService(this.pointList , this.app.stage);
+      if(this.giftWrapping != null)
+      {
+          this.giftWrapping.clearAllLines();
+          this.giftWrapping.stop();
+      }
+
+      this.giftWrapping = new GiftWrappingService(this.pointList , this.app.stage);
+  }
+
+  public calculateQuickHull()
+  {
+      
+  }
+
+  public clearCanvas()
+  {
+      if(this.giftWrapping != null)
+      {
+          this.giftWrapping.clearAllLines();
+            this.giftWrapping.stop();
+      }
+
+      for(let n = 0 ; n < this.pointList.length ; n++)
+      {
+          this.pointList[n].clear();
+      }
+
+      this.pointList = [];
+      this.giftWrapping = null;
+  }
+
+  public createRandomPoints()
+  {
+      var pointCount = this.getRandomInt( this.minRandomPoints , this.maxRandomPoints );
+
+      for(let n = 0 ; n < pointCount ; n++)
+      {
+          var x = this.getRandomInt( this.randomSpawnPointMargin.x , this.screenSize.x - this.randomSpawnPointMargin.x );
+          var y = this.getRandomInt( this.randomSpawnPointMargin.y , this.screenSize.y - this.randomSpawnPointMargin.y );
+          this.createPoint( x , y );
+      }
+  }
+
+  private getRandomInt(min, max) : number
+  {
+      return Math.floor(Math.random() * (max - min)) + min;
   }
 
 

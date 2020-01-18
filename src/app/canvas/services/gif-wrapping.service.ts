@@ -12,9 +12,13 @@ export class GiftWrappingService
     private currentMinAngle : number = 0;
     private currentMinAngleLine : Graphics = null;
     private activeLines : Graphics[] = [];
+    private pointList : Point[] = [];
+    private stopped : boolean = false;
 
-    constructor(private pointList : Point[] , private container : Container)
+    constructor(pointList : Point[] , private container : Container)
     {
+        this.pointList = pointList.slice();
+
         //pick a starting point for the gift wrapping
         this.pickStartingPoint();
         //initialize and start the gift wrapping
@@ -83,6 +87,9 @@ export class GiftWrappingService
 
     private findNextPoint()
     {
+        if(this.stopped)
+          return;
+
         var lastSelectedPoint = this.getLastSelectedPoint();
         var randomSelectedPoint = this.pickRandomElementFromArray(this.tempPointList);
 
@@ -203,6 +210,11 @@ export class GiftWrappingService
           {
               this.findNextPoint();
           }
+          else if( this.currentMinAngleLine != null )
+          {
+              this.currentMinAngleLine.clear();
+              this.currentMinAngleLine = null;
+          }
 
         } );
 
@@ -227,5 +239,24 @@ export class GiftWrappingService
         }
     }
 
+    public clearAllLines()
+    {
+        if(this.currentMinAngleLine != null)
+            this.currentMinAngleLine.clear();
+
+        this.currentMinAngleLine = null;
+
+        for(let n = 0 ; n < this.activeLines.length ; n++)
+        {
+            this.activeLines[n].clear();
+        }
+
+        this.activeLines = [];
+    }
+
+    public stop()
+    {
+        this.stopped = true;
+    }
 
 }

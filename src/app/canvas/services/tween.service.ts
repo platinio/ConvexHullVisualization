@@ -13,8 +13,8 @@ export class TweenService
         createjs.Ticker.addEventListener("tick", this.stage);
     }
 
-    public scaleTween(target: any , to : Vector2 , time : number)
+    public scaleTween(target: any , to : Vector2 , time : number)  : any
     {
-        createjs.Tween.get(target).to({ x: to.x , y : to.y }, time , createjs.Ease.elasticOut);
+        return createjs.Tween.get(target).to({ x: to.x , y : to.y }, time , createjs.Ease.elasticOut);
     }
 }
