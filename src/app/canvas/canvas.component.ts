@@ -27,7 +27,7 @@ export class CanvasComponent implements OnInit
   private minRandomPoints : number = 20;
   private maxRandomPoints : number = 40;
   private randomSpawnPointMargin : Vector2 = new Vector2(400 , 200);
-  private speed : number = 1;
+  private speed : number = 20;
 
   //ellipse : Graphics;
   //coords = { x: 0, y: 0 };

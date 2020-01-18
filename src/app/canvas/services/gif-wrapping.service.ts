@@ -100,14 +100,20 @@ export class GiftWrappingService extends ConvexHull
 
         //draw a line to the random selected point
         var result = this.graph.drawLine( lastSelectedPoint.position , randomSelectedPoint.position , 5 , 0xf5dea3 , this.speed );
+        this.activeLines.push( result[1] );
         result[0].call( () =>
         {
+            if(this.stopped)
+              return;
+
+            result[1].clear();
+            this.removeValueFromArray(this.activeLines , result[1]);
             //check if we should override the current selected point base on the local angle
             this.checkPointAngle( lastSelectedPoint , randomSelectedPoint );
 
             //clear the last draw line
             //this.graph.clearLastGraphic();
-            result[1].clear();
+
 
             //still have more temp points to check?
             if( this.haveMorePointsToCheck() )
@@ -204,9 +210,10 @@ export class GiftWrappingService extends ConvexHull
     private processPointSelected( selectedPoint : Point )
     {
         var result = this.graph.drawLine( selectedPoint.position , this.currentMinAnglePoint.position , 5 , 0xf5dea3 , this.speed  );
+        this.activeLines.push( result[1] );
         result[0].call( () => {
 
-          this.activeLines.push( result[1] );
+
           //if convex hull is no complete keep going
           if( !this.convexHullIsComplete() )
           {
