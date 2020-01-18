@@ -36,8 +36,14 @@ export class QuickHullService extends ConvexHull
         var result = this.graph.drawLine( lastSelectedPoints[0].position , lastSelectedPoints[1].position , 5 , 0xf5dea3 , this.speed  );
         result[0].call( () =>
         {
+
+
             var midPoint = this.calculateMidPoint( lastSelectedPoints[0].position , lastSelectedPoints[1].position );
             var maxDistancePoint = this.getMaxDistancePoint( midPoint );
+
+            //alert(maxDistancePoint.position.y);
+
+            this.markPointAsSelected( maxDistancePoint );
 
             var leftLine = new Line( lastSelectedPoints[0].position , maxDistancePoint.position );
             var rightLine = new Line( lastSelectedPoints[1].position , maxDistancePoint.position );
@@ -46,11 +52,11 @@ export class QuickHullService extends ConvexHull
             this.convexHull.push( rightLine );
 
             this.graph.drawLine( lastSelectedPoints[0].position , maxDistancePoint.position , 5 , 0xf5dea3 , this.speed  );
-            this.graph.drawLine( lastSelectedPoints[1].position , maxDistancePoint.position , 5 , 0xf5dea3 , this.speed  );
+            this.graph.drawLine( lastSelectedPoints[1].position , maxDistancePoint.position , 5 , 0xf5dea3 , this.speed  )[0].call( () => {
+              this.removePointsInsideConvexHull();
+              this.findNextLine();
+            } );
 
-            this.markPointAsSelected( maxDistancePoint );
-
-            this.removePointsInsideConvexHull();
 
         } );
     }
@@ -72,7 +78,8 @@ export class QuickHullService extends ConvexHull
 
     private getLastSelectedPoints() : Point[]
     {
-        return [this.selectedPoints[ this.selectedPoints.length - 1 ] , this.selectedPoints[ this.selectedPoints.length - 2 ]];
+        //return [this.selectedPoints[ this.selectedPoints.length - 1 ] , this.selectedPoints[ this.selectedPoints.length - 2 ]];
+        return [this.selectedPoints[ 0 ] , this.selectedPoints[ 1 ]];
     }
 
     private pickStartingLine() : Point[]
