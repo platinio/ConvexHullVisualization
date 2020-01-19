@@ -35,7 +35,10 @@ export class QuickHullService extends ConvexHull
 
         //this.sideForProcess.push( new Line( points[0].position , points[1].position ) );
 
+
     }
+
+
 
     public clearAllLines()
     {
@@ -124,44 +127,44 @@ export class QuickHullService extends ConvexHull
 
     private getPointsAboveLine(line : Line) : Point[]
     {
-      var result = [];
+        var result = [];
 
-      for(let n = 0 ; n < this.pointList.length ; n++)
-      {
-          var p = this.pointList[n].position;
-          var v1 = new Vector2( line.p2.x - line.p1.x , line.p2.y - line.p1.y );
-          var v2 = new Vector2( p.x - line.p1.x , p.y - line.p2.y );
+        for(let n = 0 ; n < this.pointList.length ; n++)
+        {
+            var p = this.pointList[n].position;
+            var v1 = new Vector2( line.p2.x - line.p1.x , line.p2.y - line.p1.y );
+            var v2 = new Vector2( line.p2.x - p.x, line.p2.y - p.y );
 
-          var c = v1.x * v2.y - v1.y * v2.x;
+            var c = v1.x * v2.y - v1.y * v2.x;
 
-          if(c > 0)
-          {
-              result.push( this.pointList[n] );
-          }
-      }
+            if(c > 0)
+            {
+                result.push( this.pointList[0] );
+            }
+        }
 
-      return result;
+        return result;
     }
 
     private getPointsBehindLine(line : Line) : Point[]
     {
-      var result = [];
+        var result = [];
 
-      for(let n = 0 ; n < this.pointList.length ; n++)
-      {
-          var p = this.pointList[n].position;
-          var v1 = new Vector2( line.p2.x - line.p1.x , line.p2.y - line.p1.y );
-          var v2 = new Vector2( p.x - line.p1.x , p.y - line.p2.y );
+        for(let n = 0 ; n < this.pointList.length ; n++)
+        {
+            var p = this.pointList[n].position;
+            var v1 = new Vector2( line.p2.x - line.p1.x , line.p2.y - line.p1.y );
+            var v2 = new Vector2( line.p2.x - p.x, line.p2.y - p.y );
 
-          var c = v1.x * v2.y - v1.y * v2.x;
+            var c = v1.x * v2.y - v1.y * v2.x;
 
-          if(c < 0)
-          {
-              result.push( this.pointList[n] );
-          }
-      }
+            if(c < 0 || c == 0)
+            {
+                result.push( this.pointList[0] );
+            }
+        }
 
-      return result;
+        return result;
     }
 
     private getPointsAbove(y : number) : Point[]
