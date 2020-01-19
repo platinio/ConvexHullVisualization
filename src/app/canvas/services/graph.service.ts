@@ -26,7 +26,7 @@ export class GraphService
         line.moveTo(from.x , from.y);
         var desirePos = new Vector2( from.x , from.y );
 
-        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, t * 100 );
+        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, t * 1000 );
 
         tween.addEventListener("change", () => {
           line.moveTo(from.x , from.y);

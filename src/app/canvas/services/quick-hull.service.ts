@@ -9,6 +9,7 @@ export class QuickHullService extends ConvexHull
     private selectedPoints : Point[] = null;
     private selectedLines : [] = [];
     private convexHull : Line[] = [];
+    private sideForProcess : Line[] = [];
 
     constructor(pointList : Point[] , private container : Container , speed : number)
     {
@@ -20,8 +21,20 @@ export class QuickHullService extends ConvexHull
 
         this.markPointAsSelected( points[0] );
         this.markPointAsSelected( points[1] );
+
+        var lowerPoint = points[0].position.y < points[1].position.y ? points[0] : points[1];
+
+
+
+        var upperPart = this.getPointsAboveLine( new Line( points[0].position , points[1].position ) );
+        var lowerPart = this.getPointsBehindLine( new Line( points[0].position , points[1].position ) );
+
         this.convexHull.push( new Line( points[0].position , points[1].position ) );
-        this.findNextLine();
+        this.findNextLine( new Line( points[0].position , points[1].position )  , upperPart );
+        this.findNextLine( new Line( points[0].position , points[1].position )  , lowerPart );
+
+        //this.sideForProcess.push( new Line( points[0].position , points[1].position ) );
+
     }
 
     public clearAllLines()
@@ -29,8 +42,9 @@ export class QuickHullService extends ConvexHull
 
     }
 
-    private findNextLine()
+    private findNextLine(line : Line , points : Point[])
     {
+      /*
         var lastSelectedPoints = this.getLastSelectedPoints();
 
         var result = this.graph.drawLine( lastSelectedPoints[0].position , lastSelectedPoints[1].position , 5 , 0xf5dea3 , this.speed  );
@@ -58,7 +72,126 @@ export class QuickHullService extends ConvexHull
             } );
 
 
+        } );*/
+
+        var result = this.graph.drawLine( line.p1 , line.p2 , 5 , 0xf5dea3 , this.speed  );
+        result[0].call( () => {
+
+            var midPoint = this.calculateMidPoint( line.p1 , line.p2 );
+            var maxDistancePoint = this.getMaxDistancePointArray( midPoint , points );
+
+            this.markPointAsSelectedArray( maxDistancePoint , points );
+
+            var leftLine = new Line( line.p1  , maxDistancePoint.position );
+            var rightLine = new Line( line.p2 , maxDistancePoint.position );
+
+            this.sideForProcess.push( leftLine );
+            this.sideForProcess.push( rightLine );
+
+              this.removePointsInsideConvexHullArray(points);
+
+            this.convexHull.push( leftLine );
+            this.convexHull.push( rightLine );
+
+            this.graph.drawLine( leftLine.p1 , leftLine.p2 , 5 , 0xf5dea3 , this.speed  );
+            this.graph.drawLine( rightLine.p1 , rightLine.p2 , 5 , 0xf5dea3 , this.speed  )[0].call( () => {
+              if(points.length > 0)
+              {
+                //result[1].clear();
+                //this.findNextLine( leftLine , points.slice() );
+                //this.findNextLine( rightLine , points.slice() );
+                this.nextStep( points );
+              }
+            } );
+
+
+
+
+
         } );
+
+    }
+
+    private nextStep(points : Point[])
+    {
+        if(this.sideForProcess.length > 0)
+        {
+            var line = this.sideForProcess[0];
+            this.removeValueFromArray(this.sideForProcess , line);
+            this.findNextLine(line , points);
+        }
+    }
+
+    private getPointsAboveLine(line : Line) : Point[]
+    {
+      var result = [];
+
+      for(let n = 0 ; n < this.pointList.length ; n++)
+      {
+          var p = this.pointList[n].position;
+          var v1 = new Vector2( line.p2.x - line.p1.x , line.p2.y - line.p1.y );
+          var v2 = new Vector2( p.x - line.p1.x , p.y - line.p2.y );
+
+          var c = v1.x * v2.y - v1.y * v2.x;
+
+          if(c > 0)
+          {
+              result.push( this.pointList[n] );
+          }
+      }
+
+      return result;
+    }
+
+    private getPointsBehindLine(line : Line) : Point[]
+    {
+      var result = [];
+
+      for(let n = 0 ; n < this.pointList.length ; n++)
+      {
+          var p = this.pointList[n].position;
+          var v1 = new Vector2( line.p2.x - line.p1.x , line.p2.y - line.p1.y );
+          var v2 = new Vector2( p.x - line.p1.x , p.y - line.p2.y );
+
+          var c = v1.x * v2.y - v1.y * v2.x;
+
+          if(c < 0)
+          {
+              result.push( this.pointList[n] );
+          }
+      }
+
+      return result;
+    }
+
+    private getPointsAbove(y : number) : Point[]
+    {
+        var result = [];
+
+        for(let n = 0 ; n < this.pointList.length ; n++)
+        {
+            if(this.pointList[n].position.y > y)
+            {
+                result.push( this.pointList[n] );
+            }
+        }
+
+        return result;
+    }
+
+    private getPointsBehind(y : number) : Point[]
+    {
+        var result = [];
+
+        for(let n = 0 ; n < this.pointList.length ; n++)
+        {
+            if(this.pointList[n].position.y <= y)
+            {
+                result.push( this.pointList[n] );
+            }
+        }
+
+        return result;
     }
 
     private removePointsInsideConvexHull()
@@ -69,8 +202,24 @@ export class QuickHullService extends ConvexHull
             if( Line.isInside( this.convexHull , this.pointList[n].position ) )
             {
 
-                this.pointList[n].clear();
+                //-this.pointList[n].clear();
                 this.removeValueFromArray( this.pointList , this.pointList[n] );
+                n--;
+            }
+        }
+    }
+
+    private removePointsInsideConvexHullArray(points : Point[])
+    {
+
+        for(let n = 0 ; n < points.length ; n++)
+        {
+            if( Line.isInside( this.convexHull , points[n].position ) )
+            {
+                /*
+                if(points[n] != null)
+                  points[n].clear();*/
+                this.removeValueFromArray( points , points[n] );
                 n--;
             }
         }
@@ -114,6 +263,17 @@ export class QuickHullService extends ConvexHull
         this.removeValueFromArray( this.pointList , point );
     }
 
+    private markPointAsSelectedArray(point : Point , pointList : Point[])
+    {
+        if(this.selectedPoints == null)
+        {
+            this.selectedPoints = [];
+        }
+
+        this.selectedPoints.push( point );
+        this.removeValueFromArray( pointList , point );
+    }
+
     private removeValueFromArray(array : any , value : any)
     {
         for(let n = 0 ; n < array.length ; n++)
@@ -142,6 +302,26 @@ export class QuickHullService extends ConvexHull
             if( distance > maxDistance )
             {
                 closerPoint = this.pointList[n];
+                maxDistance = distance;
+            }
+        }
+
+        return closerPoint;
+    }
+
+    private getMaxDistancePointArray(p : Vector2 , points : Point[] ) : Point
+    {
+
+
+        var closerPoint = points[0];
+        var maxDistance = -99999;
+
+        for(let n = 0 ; n < points.length ; n++)
+        {
+            var distance = points[n].position.getDistance( p );
+            if( distance > maxDistance )
+            {
+                closerPoint = points[n];
                 maxDistance = distance;
             }
         }
