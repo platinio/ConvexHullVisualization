@@ -10,6 +10,7 @@ export class QuickHullService extends ConvexHull
     private selectedLines : [] = [];
     private convexHull : Line[] = [];
     private convexHullStack : any = [];
+    public firstTime : boolean = true;
 
     constructor(pointList : Point[] , private container : Container , speed : number)
     {
@@ -31,8 +32,8 @@ export class QuickHullService extends ConvexHull
         this.convexHull.push( line );
 
 
-        this.convexHullStack.push( [ line , above , 1 ] );
-        this.convexHullStack.push( [ line , below , -1 ] );
+        this.convexHullStack.push( [ line , above , 1 , 1] );
+        this.convexHullStack.push( [ line , below , -1 , 1 ] );
 
         this.nextStep(  );
 
@@ -45,13 +46,13 @@ export class QuickHullService extends ConvexHull
 
     }
 
-    private findNextLine(line : Line , points : Point[] , flag : number)
+    private findNextLine(line : Line , points : Point[] , vertical : number , horizontal)
     {
 
         var result = this.graph.drawLine( line.p1 , line.p2 , 5 , 0xf5dea3 , this.speed  );
         result[0].call( () => {
 
-            var r = (flag > 0 ? this.getPointsAboveLine( line , points ) : this.getPointsBelowLine( line , points ));
+            var r = (vertical * horizontal * (this.convexHull.length < 5 ? 1.0 : -1.0) > 0 ? this.getPointsAboveLine( line , points ) : this.getPointsBelowLine( line , points ));
             var maxDistancePoint = this.getMaxDistancePointArray( line.p1 , line.p2 , r );
 
             if(maxDistancePoint == null)
@@ -66,7 +67,7 @@ export class QuickHullService extends ConvexHull
             var rightLine = new Line( line.p2 , maxDistancePoint.position );
 
 
-
+            this.firstTime = false;
 
 
             this.convexHull.push( leftLine );
@@ -74,8 +75,8 @@ export class QuickHullService extends ConvexHull
 
             this.removePointsInsideConvexHullArray(points);
 
-            this.convexHullStack.push( [ leftLine , points , 1 * flag ] );
-            this.convexHullStack.push( [ rightLine , points , -1 * flag ] );
+            this.convexHullStack.push( [ leftLine , points , vertical , -1] );
+            this.convexHullStack.push( [ rightLine , points , vertical , 1] );
 
             this.graph.drawLine( leftLine.p1 , leftLine.p2 , 5 , 0xf5dea3 , this.speed  );
             this.graph.drawLine( rightLine.p1 , rightLine.p2 , 5 , 0xf5dea3 , this.speed  )[0].call( () => {
@@ -85,6 +86,7 @@ export class QuickHullService extends ConvexHull
                 //this.findNextLine( leftLine , points.slice() );
                 //this.findNextLine( rightLine , points.slice() );
                 this.nextStep(  );
+                alert(this.convexHull.length);
               }
             } );
 
@@ -96,13 +98,18 @@ export class QuickHullService extends ConvexHull
 
     }
 
+    private findSide()
+    {
+      
+    }
+
     private nextStep()
     {
         if(this.convexHullStack.length > 0)
         {
             var info = this.convexHullStack[0];
             this.convexHullStack.splice(0 , 1);
-            this.findNextLine(info[0] , info[1] , info[2]);
+            this.findNextLine(info[0] , info[1] , info[2] , info[3]);
         }
     }
 
