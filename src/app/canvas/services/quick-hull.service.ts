@@ -32,8 +32,8 @@ export class QuickHullService extends ConvexHull
         this.convexHull.push( line );
 
 
-        this.convexHullStack.push( [ line , above , 1 , 1] );
-        this.convexHullStack.push( [ line , below , -1 , 1 ] );
+        this.convexHullStack.push( [ line , above , -1 ] );
+        this.convexHullStack.push( [ line , below , 1 ] );
 
         this.nextStep(  );
 
@@ -46,25 +46,38 @@ export class QuickHullService extends ConvexHull
 
     }
 
-    private findNextLine(line : Line , points : Point[] , vertical : number , horizontal)
+    private findNextLine(line : Line , points : Point[] , side : number)
     {
 
-        var result = this.graph.drawLine( line.p1 , line.p2 , 5 , 0xf5dea3 , this.speed  );
+        var result = this.graph.drawLine( line.p1 , line.p2 , 5 ,  0xff3333 , this.speed  );
         result[0].call( () => {
 
-            var r = (vertical * horizontal * (this.convexHull.length < 5 ? 1.0 : -1.0) > 0 ? this.getPointsAboveLine( line , points ) : this.getPointsBelowLine( line , points ));
-            var maxDistancePoint = this.getMaxDistancePointArray( line.p1 , line.p2 , r );
+            //var r = (vertical * horizontal * (this.convexHull.length < 5 ? 1.0 : -1.0) > 0 ? this.getPointsAboveLine( line , points ) : this.getPointsBelowLine( line , points ));
+            //var maxDistancePoint = this.getMaxDistancePointArray( line.p1 , line.p2 , r );
+            var maxDistancePoint = null;
+            var maxDistance = -1;
+            for(let n = 0 ; n < points.length ; n++)
+            {
+                var d : number = this.distanceToLine( line , points[n].position );
+
+                if( this.findSide( line , points[n].position ) == side && d > maxDistance)
+                {
+                    maxDistancePoint = points[n];
+                    maxDistance = d;
+                }
+            }
 
             if(maxDistancePoint == null)
             {
+              
                 this.nextStep(  );
                 return;
             }
 
             this.markPointAsSelectedArray( maxDistancePoint , points );
 
-            var leftLine = new Line( line.p1  , maxDistancePoint.position );
-            var rightLine = new Line( line.p2 , maxDistancePoint.position );
+            var leftLine = new Line(maxDistancePoint.position , line.p1   );
+            var rightLine = new Line(maxDistancePoint.position , line.p2  );
 
 
             this.firstTime = false;
@@ -73,20 +86,21 @@ export class QuickHullService extends ConvexHull
             this.convexHull.push( leftLine );
             this.convexHull.push( rightLine );
 
-            this.removePointsInsideConvexHullArray(points);
+            //this.removePointsInsideConvexHullArray(points);
 
-            this.convexHullStack.push( [ leftLine , points , vertical , -1] );
-            this.convexHullStack.push( [ rightLine , points , vertical , 1] );
+            this.convexHullStack.push( [ leftLine , points , -this.findSide( new Line( maxDistancePoint.position , line.p1 ) , line.p2  ) ] );
+            this.convexHullStack.push( [ rightLine , points , -this.findSide( new Line( maxDistancePoint.position , line.p2 ) , line.p1  ) ] );
 
             this.graph.drawLine( leftLine.p1 , leftLine.p2 , 5 , 0xf5dea3 , this.speed  );
             this.graph.drawLine( rightLine.p1 , rightLine.p2 , 5 , 0xf5dea3 , this.speed  )[0].call( () => {
               if(points.length > 0)
               {
+
                 //result[1].clear();
                 //this.findNextLine( leftLine , points.slice() );
                 //this.findNextLine( rightLine , points.slice() );
                 this.nextStep(  );
-                alert(this.convexHull.length);
+                //alert(this.convexHull.length);
               }
             } );
 
@@ -98,18 +112,32 @@ export class QuickHullService extends ConvexHull
 
     }
 
-    private findSide()
+    private distanceToLine(line : Line , point : Vector2) : number
     {
-      
+        return Math.abs(  ( point.y - line.p1.y ) * ( line.p2.x - line.p1.x ) -
+                          ( line.p2.y - line.p1.y ) * (  point.x - line.p1.x ) );
+    }
+
+    private findSide(line : Line , point : Vector2) : number
+    {
+        var val : number =  ( point.y - line.p1.y ) * ( line.p2.x - line.p1.x ) -
+                        ( line.p2.y - line.p1.y ) * (  point.x - line.p1.x );
+        if(val > 0)
+          return 1;
+        if(val < 0)
+          return -1;
+
+        return 0;
     }
 
     private nextStep()
     {
+
         if(this.convexHullStack.length > 0)
         {
             var info = this.convexHullStack[0];
             this.convexHullStack.splice(0 , 1);
-            this.findNextLine(info[0] , info[1] , info[2] , info[3]);
+            this.findNextLine(info[0] , info[1] , info[2] );
         }
     }
 
