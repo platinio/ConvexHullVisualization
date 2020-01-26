@@ -32,8 +32,8 @@ export class QuickHullService extends ConvexHull
         this.convexHull.push( line );
 
 
-        this.convexHullStack.push( [ line , above , -1 ] );
-        this.convexHullStack.push( [ line , below , 1 ] );
+        this.convexHullStack.push( [ line , null , above , -1 , true] );
+        this.convexHullStack.push( [ line , null , below , 1 , false] );
 
         this.nextStep(  );
 
@@ -46,69 +46,81 @@ export class QuickHullService extends ConvexHull
 
     }
 
-    private findNextLine(line : Line , points : Point[] , side : number)
+    private findNextLine(line : Line , oldLine : Graphics , points : Point[] , side : number , drawLine : boolean)
+    {
+        if(drawLine)
+        {
+            var result = this.graph.drawLine( line.p1 , line.p2 , 5 ,  0xf5dea3 , this.speed  );
+            result[0].call( () => {
+
+                this.processQuickHull(line , result[1] , points , side);
+            } );
+        }
+        else
+        {
+            this.processQuickHull(line , oldLine , points , side);
+        }
+
+
+    }
+
+    private processQuickHull(line : Line , oldLine : Graphics , points : Point[] , side : number )
     {
 
-        var result = this.graph.drawLine( line.p1 , line.p2 , 5 ,  0xff3333 , this.speed  );
-        result[0].call( () => {
+        var maxDistancePoint = null;
+        var maxDistance = -1;
+        for(let n = 0 ; n < points.length ; n++)
+        {
+            var d : number = this.distanceToLine( line , points[n].position );
 
-            //var r = (vertical * horizontal * (this.convexHull.length < 5 ? 1.0 : -1.0) > 0 ? this.getPointsAboveLine( line , points ) : this.getPointsBelowLine( line , points ));
-            //var maxDistancePoint = this.getMaxDistancePointArray( line.p1 , line.p2 , r );
-            var maxDistancePoint = null;
-            var maxDistance = -1;
-            for(let n = 0 ; n < points.length ; n++)
+            if( this.findSide( line , points[n].position ) == side && d > maxDistance)
             {
-                var d : number = this.distanceToLine( line , points[n].position );
-
-                if( this.findSide( line , points[n].position ) == side && d > maxDistance)
-                {
-                    maxDistancePoint = points[n];
-                    maxDistance = d;
-                }
+                maxDistancePoint = points[n];
+                maxDistance = d;
             }
+        }
 
-            if(maxDistancePoint == null)
+        if(maxDistancePoint == null)
+        {
+
+            this.nextStep(  );
+            return;
+        }
+
+        this.markPointAsSelectedArray( maxDistancePoint , points );
+
+        var leftLine = new Line(maxDistancePoint.position , line.p1   );
+        var rightLine = new Line(maxDistancePoint.position , line.p2  );
+
+
+        this.firstTime = false;
+
+
+        this.convexHull.push( leftLine );
+        this.convexHull.push( rightLine );
+
+        //this.removePointsInsideConvexHullArray(points);
+
+
+
+        var leftLineResult = this.graph.drawLine( leftLine.p2 , leftLine.p1 , 5 , 0xf5dea3 , this.speed  );
+        var rightLineResult = this.graph.drawLine( rightLine.p2 , rightLine.p1 , 5 , 0xf5dea3 , this.speed  );
+
+        this.convexHullStack.push( [ leftLine , leftLineResult[1] , points , -this.findSide( new Line( maxDistancePoint.position , line.p1 ) , line.p2  ) , false] );
+        this.convexHullStack.push( [ rightLine , rightLineResult[1] , points , -this.findSide( new Line( maxDistancePoint.position , line.p2 ) , line.p1  ) , false ] );
+
+
+
+        rightLineResult[0].call( () => {
+
+            if(oldLine != null)
             {
-              
-                this.nextStep(  );
-                return;
+                oldLine.clear();
             }
-
-            this.markPointAsSelectedArray( maxDistancePoint , points );
-
-            var leftLine = new Line(maxDistancePoint.position , line.p1   );
-            var rightLine = new Line(maxDistancePoint.position , line.p2  );
-
-
-            this.firstTime = false;
-
-
-            this.convexHull.push( leftLine );
-            this.convexHull.push( rightLine );
-
-            //this.removePointsInsideConvexHullArray(points);
-
-            this.convexHullStack.push( [ leftLine , points , -this.findSide( new Line( maxDistancePoint.position , line.p1 ) , line.p2  ) ] );
-            this.convexHullStack.push( [ rightLine , points , -this.findSide( new Line( maxDistancePoint.position , line.p2 ) , line.p1  ) ] );
-
-            this.graph.drawLine( leftLine.p1 , leftLine.p2 , 5 , 0xf5dea3 , this.speed  );
-            this.graph.drawLine( rightLine.p1 , rightLine.p2 , 5 , 0xf5dea3 , this.speed  )[0].call( () => {
-              if(points.length > 0)
-              {
-
-                //result[1].clear();
-                //this.findNextLine( leftLine , points.slice() );
-                //this.findNextLine( rightLine , points.slice() );
-                this.nextStep(  );
-                //alert(this.convexHull.length);
-              }
-            } );
-
-
-
-
-
+            this.nextStep(  );
         } );
+
+
 
     }
 
@@ -137,7 +149,7 @@ export class QuickHullService extends ConvexHull
         {
             var info = this.convexHullStack[0];
             this.convexHullStack.splice(0 , 1);
-            this.findNextLine(info[0] , info[1] , info[2] );
+            this.findNextLine(info[0] , info[1] , info[2] , info[3] , info[4] );
         }
     }
 
