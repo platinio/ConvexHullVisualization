@@ -1,9 +1,12 @@
 import { Component , ViewChild , ElementRef , OnInit , NgZone , Injectable} from '@angular/core';
+
 import { Application , Graphics } from 'pixi.js';
 import { Point , Vector2 } from './point.model';
 import { TweenService } from './services/tween.service';
 import { GiftWrappingService } from './services/gif-wrapping.service';
 import { QuickHullService } from './services/quick-hull.service';
+import { MatMenuTrigger } from '@angular/material/menu';
+
 
 
 
@@ -20,7 +23,7 @@ export class CanvasComponent implements OnInit
 {
   private app: Application;
 
-  private screenSize = {x: window.innerWidth /1.2 , y: window.innerHeight /1.5 };
+  private screenSize = {x: window.innerWidth , y: window.innerHeight };
   private pointList : Point[];
   private giftWrapping : GiftWrappingService = null;
   private quickHull : QuickHullService = null;
@@ -28,6 +31,13 @@ export class CanvasComponent implements OnInit
   private maxRandomPoints : number = 40;
   private randomSpawnPointMargin : Vector2 = new Vector2(400 , 200);
   private speed : number = 20;
+  @ViewChild(MatMenuTrigger, {static: false} ) trigger: MatMenuTrigger;
+  public menuItems: [] = [
+    {value: 'gift-wrapping', viewValue: 'Gift Wrapping'},
+    {value: 'quick-hull', viewValue: 'Quick Hull'}
+    
+  ];
+  public selected = "gift-wrapping";
 
   //ellipse : Graphics;
   //coords = { x: 0, y: 0 };
@@ -39,7 +49,7 @@ export class CanvasComponent implements OnInit
 
   ngOnInit(): void
   {
-
+    //this.trigger.openMenu();
     //this.setupCreatejs();
     this.setupPixijs();
     this.pointList = [];
@@ -61,7 +71,7 @@ export class CanvasComponent implements OnInit
 
         });
 
-        this.app.renderer.backgroundColor = 0x02a8a8;
+        this.app.renderer.backgroundColor = 0x212121;
 
       });
 

@@ -6,6 +6,14 @@ import { AppComponent } from './app.component';
 import { CanvasComponent } from './canvas/canvas.component';
 
 import { TweenService } from './canvas/services/tween.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import {MatMenuModule} from '@angular/material/menu';
+import {MatIconModule} from '@angular/material/icon';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field'
+import {MatInputModule} from '@angular/material'
 
 @NgModule({
   declarations: [
@@ -14,8 +22,16 @@ import { TweenService } from './canvas/services/tween.service';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
-  ],
+    AppRoutingModule,    
+    BrowserAnimationsModule,   
+    MatMenuModule,
+    MatIconModule,
+    MatToolbarModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatInputModule
+  ],  
+
   providers: [ TweenService ],
   bootstrap: [AppComponent]
 })
