@@ -3,6 +3,13 @@
   "rules": {
     "array-type": false,
     "arrow-parens": false,
+    "one-line" : false,
+    "prefer-for-of" : false,
+    "triple-equals": false,
+    "curly": false,
+    "typedef-whitespace" : false,
+    "whitespace": false,
+    "no-trailing-whitespace": false,
     "deprecation": {
       "severity": "warning"
     },

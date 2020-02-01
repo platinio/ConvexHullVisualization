@@ -20,7 +20,7 @@ export class CanvasComponent implements OnInit
 {
   private app: Application;
 
-  private screenSize = {x: 2048 , y: 1024};
+  private screenSize = {x: window.innerWidth /1.2 , y: window.innerHeight /1.5 };
   private pointList : Point[];
   private giftWrapping : GiftWrappingService = null;
   private quickHull : QuickHullService = null;
