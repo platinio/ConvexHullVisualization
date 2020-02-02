@@ -1,4 +1,4 @@
-import { Component , ViewChild , ElementRef , OnInit , NgZone , Injectable} from '@angular/core';
+import { Component , ViewChild , ElementRef , OnInit , NgZone , Injectable , HostListener} from '@angular/core';
 
 import { Application , Graphics } from 'pixi.js';
 import { Point , Vector2 } from './point.model';
@@ -30,18 +30,9 @@ export class CanvasComponent implements OnInit
   private minRandomPoints : number = 20;
   private maxRandomPoints : number = 40;
   private randomSpawnPointMargin : Vector2 = new Vector2(400 , 200);
-  private speed : number = 20;
-  @ViewChild(MatMenuTrigger, {static: false} ) trigger: MatMenuTrigger;
-  public menuItems: [] = [
-    {value: 'gift-wrapping', viewValue: 'Gift Wrapping'},
-    {value: 'quick-hull', viewValue: 'Quick Hull'}
-    
-  ];
-  public selected = "gift-wrapping";
+  private speed : number = 20;  
 
-  //ellipse : Graphics;
-  //coords = { x: 0, y: 0 };
-
+  
 
   constructor(private tweenService : TweenService , private elementRef: ElementRef, private ngZone: NgZone) {}
 
@@ -175,6 +166,12 @@ export class CanvasComponent implements OnInit
           this.quickHull.setSpeed( this.speed );
       }
   }
+
+    @HostListener('window:resize', ['$event'])
+    onResize(event) 
+    {        
+        this.app.renderer.resize(window.innerWidth, window.innerHeight);        
+    }
 
 
 }

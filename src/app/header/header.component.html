@@ -1,0 +1,35 @@
+<style>
+  .header {
+    display: flex;	
+	min-height: 100px;
+  }
+  /* Row Gap */
+  .header > * {
+	flex: 1;
+  }
+</style>
+
+<mat-toolbar fxLayout="row" fxLayoutGap="40px" color="primary" class="header">
+	
+		<mat-form-field>
+		<mat-select [(value)]="selectedAlgorithm">
+    		<mat-option *ngFor="let item of algorithmSelect" [value]="item.value">
+     	 		{{item.viewValue}}
+    		</mat-option>
+		  </mat-select>		  
+	</mat-form-field>	
+	<span flex></span>
+	<button mat-raised-button flex="0 2 calc(10.3% - 32px)">Random</button>
+	<button mat-raised-button flex="0 2 calc(10.3% - 32px)">Random</button>
+
+	<span flex></span>
+	<span flex></span>
+
+	<mat-slider
+		thumbLabel
+		[displayWith]="formatLabel"
+		tickInterval="0.5"
+		min="0.5"
+		max="10"></mat-slider>
+</mat-toolbar>
+
