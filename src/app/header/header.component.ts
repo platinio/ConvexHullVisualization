@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit , Output , EventEmitter} from '@angular/core';
 
 export interface SelectItem
 {
@@ -20,14 +20,20 @@ export class HeaderComponent implements OnInit
 
   public selectedAlgorithm = "gift-wrapping";
 
-  constructor() { }
+  @Output() selectedAlgorithmChange = new EventEmitter();
+  @Output() playClick = new EventEmitter();
 
-  ngOnInit() {
+  constructor() { }
+  ngOnInit() {  }
+
+  public onSelectedAlgorithmChange()
+  {
+    this.selectedAlgorithmChange.emit();
   }
 
-  formatLabel(value: number) {
-    
-    return  value + 'x';
+  public onPlay()
+  {
+    this.playClick.emit();
   }
 
 }

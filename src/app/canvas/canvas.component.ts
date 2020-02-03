@@ -1,4 +1,4 @@
-import { Component , ViewChild , ElementRef , OnInit , NgZone , Injectable , HostListener} from '@angular/core';
+import { Component , ViewChild , ElementRef , OnInit , NgZone , Injectable , HostListener , Output} from '@angular/core';
 
 import { Application , Graphics } from 'pixi.js';
 import { Point , Vector2 } from './point.model';
@@ -21,16 +21,18 @@ import { MatMenuTrigger } from '@angular/material/menu';
 @Injectable()
 export class CanvasComponent implements OnInit
 {
-  private app: Application;
+    private app: Application;
 
-  private screenSize = {x: window.innerWidth , y: window.innerHeight };
-  private pointList : Point[];
-  private giftWrapping : GiftWrappingService = null;
-  private quickHull : QuickHullService = null;
-  private minRandomPoints : number = 20;
-  private maxRandomPoints : number = 40;
-  private randomSpawnPointMargin : Vector2 = new Vector2(400 , 200);
-  private speed : number = 20;  
+    private screenSize = {x: window.innerWidth , y: window.innerHeight };
+    private pointList : Point[];
+    private giftWrapping : GiftWrappingService = null;
+    private quickHull : QuickHullService = null;
+    private minRandomPoints : number = 20;
+    private maxRandomPoints : number = 40;
+    private randomSpawnPointMargin : Vector2 = new Vector2(400 , 200);
+    private speed : number = 20;  
+
+    
 
   
 
