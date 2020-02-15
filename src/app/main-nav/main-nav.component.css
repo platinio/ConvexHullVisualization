@@ -21,9 +21,15 @@
 {
     display: none;
 }
-.spacer
+
+mat-select
 {
-  flex: 1 1 auto;
+  flex-basis: 10em;
+}
+
+.random-button
+{
+  flex-basis: 8em;
 }
 
 .mat-icon {

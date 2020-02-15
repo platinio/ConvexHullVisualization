@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { CanvasComponent } from './canvas/canvas.component';
 
 import { TweenService } from './canvas/services/tween.service';
+import { SettingsService } from './settings-service/settings-service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {MatMenuModule} from '@angular/material/menu';
@@ -24,12 +25,14 @@ import { LayoutModule } from '@angular/cdk/layout';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 
+
 @NgModule({
   declarations: [
     AppComponent,
     CanvasComponent,
     HeaderComponent,
     MainNavComponent
+
   ],
   imports: [
     BrowserModule,
@@ -49,7 +52,7 @@ import { MatListModule } from '@angular/material/list';
     MatListModule
   ],  
 
-  providers: [ TweenService ],
+  providers: [ TweenService, SettingsService ],
   bootstrap: [AppComponent]
 })
 

@@ -6,8 +6,14 @@
       [opened]="(isHandset$ | async) === false"
       >
     <mat-toolbar>Settings</mat-toolbar>
-    <mat-nav-list>
-      <a mat-list-item href="#">Link 1</a>
+    <mat-nav-list fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap="1em">
+      <mat-select [(value)]="selectedAlgorithm" fxFlex="10">
+          <mat-option *ngFor="let item of algorithmSelect" [value]="item.value">
+            {{item.viewValue}}
+          </mat-option>           
+      </mat-select>    
+      <a>Random</a>
+      <a>Play</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -23,20 +29,22 @@
 
       <div fxLayout="row" fxLayoutAlign="space-around center" fxFill *ngIf="!(isHandset$ | async)">
         <mat-select [(value)]="selectedAlgorithm" 
-          [fxFlex.lt-md]="20" 
-          [fxFlex.lt-lg]="15" 
-          [fxFlex.gt-lg]="10" >
+           (selectionChange)="onAlgorithmSelectChange($event.value)">
           <mat-option *ngFor="let item of algorithmSelect" [value]="item.value">
             {{item.viewValue}}
           </mat-option>
         </mat-select>    
-        <span [fxFlex.xs]="2" [fxFlex.gt-lg]="1" [fxFlex.gt-md]="1"></span>  
-        <button mat-raised-button [fxFlex.lt-md]="10" [fxFlex.lt-lg]="10" [fxFlex.gt-lg]="5">Random</button>      
-        <span fxFlex="60"></span>   
+        <span ></span>  
+        <button class="random-button" mat-raised-button
+           (click)="onRandomClick()" 
+           >Random</button>      
+        <span fxFlex="8 1 40"></span>   
         <button mat-button>
-          <mat-icon class="material-icons">play_circle_filled</mat-icon>
+          <mat-icon class="material-icons"
+          (click)="onPlayClick()"
+          >play_circle_filled</mat-icon>
         </button>
-        <span fxFlex="1"></span>  
+        <span ></span>  
           
       </div>
 

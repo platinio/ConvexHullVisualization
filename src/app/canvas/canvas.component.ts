@@ -6,6 +6,7 @@ import { TweenService } from './services/tween.service';
 import { GiftWrappingService } from './services/gif-wrapping.service';
 import { QuickHullService } from './services/quick-hull.service';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { SettingsService } from './../settings-service/settings-service';
 
 
 
@@ -36,7 +37,15 @@ export class CanvasComponent implements OnInit
 
   
 
-  constructor(private tweenService : TweenService , private elementRef: ElementRef, private ngZone: NgZone) {}
+  constructor(
+                private tweenService : TweenService , 
+                private elementRef: ElementRef, 
+                private ngZone: NgZone , 
+                public settingsService : SettingsService) 
+    {
+        this.settingsService.onPlayCliked.subscribe( () => { this.calculateConvexHull(); });
+        this.settingsService.onRandomClicked.subscribe( () => { this.createRandomPoints(); } );
+    }
 
 
 
@@ -96,6 +105,18 @@ export class CanvasComponent implements OnInit
   createPoint(x : number , y : number)
   {
       this.pointList.push( new Point( this.tweenService , this.app.stage , new Vector2(x , y) ) );
+  }
+
+  private calculateConvexHull()
+  {
+      if(this.settingsService.currentSelectedAlgorithm == "gift-wrapping")
+      {
+          this.calculateGifWrapping();
+      }
+      else
+      {
+          this.calculateQuickHull();
+      }
   }
 
   public calculateGifWrapping()
