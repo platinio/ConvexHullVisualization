@@ -2,6 +2,7 @@ import { Point , Vector2 } from '../point.model';
 import { GraphService } from './graph.service';
 import { Container , Graphics } from 'pixi.js';
 import { ConvexHull } from './convex-hull';
+import { SettingsService } from './../../settings-service/settings-service';
 
 export class GiftWrappingService extends ConvexHull
 {
@@ -14,11 +15,10 @@ export class GiftWrappingService extends ConvexHull
     private activeLines : Graphics[] = [];
 
 
-    constructor(pointList : Point[] , private container : Container , speed : number)
+    constructor(pointList : Point[] , private container : Container , private settingsService : SettingsService)
     {
         super();
-
-        this.speed = speed;
+       
         this.pointList = pointList.slice();
 
         //pick a starting point for the gift wrapping
@@ -74,7 +74,7 @@ export class GiftWrappingService extends ConvexHull
 
     private initializeGiftWrapping()
     {
-        this.graph = new GraphService(this.container);
+        this.graph = new GraphService(this.container , this.settingsService);
 
         this.resetValuesForReuse();
         this.findNextPoint();

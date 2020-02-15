@@ -3,6 +3,7 @@ import { Line } from '../line.model';
 import { GraphService } from './graph.service';
 import { Container , Graphics } from 'pixi.js';
 import { ConvexHull } from './convex-hull';
+import { SettingsService } from './../../settings-service/settings-service';
 
 export class QuickHullService extends ConvexHull
 {
@@ -11,14 +12,15 @@ export class QuickHullService extends ConvexHull
     private convexHull: Line[] = [];
     private convexHullStack: any = [];
     public firstTime = true;
+    private activeLines : Graphics[] = [];
 
-    constructor(pointList : Point[] , private container: Container , speed: number)
+    constructor(pointList : Point[] , private container: Container , private settingsService : SettingsService)
     {
-        super();
-        this.speed = speed;
-        this.graph = new GraphService(this.container);
+        super();        
+        this.graph = new GraphService(this.container , this.settingsService);
         this.pointList = pointList.slice();
         const points = this.pickStartingLine();
+        this.activeLines = [];
 
         this.markPointAsSelected( points[0] );
         this.markPointAsSelected( points[1] );
@@ -39,13 +41,23 @@ export class QuickHullService extends ConvexHull
 
     }
 
-    clearAllLines() {
-        
+    clearAllLines() 
+    {
+        for(let n = 0 ; n < this.activeLines.length ; n++)
+        {
+            if(this.activeLines[n] != null)
+                this.activeLines[n].clear();
+        }
+
+        this.activeLines = [];
     }
 
 
     private findNextLine(line: Line , oldLine: Graphics , points: Point[] , side: number , drawLine: boolean)
     {
+        if(this.stopped)
+          return;
+
         if (drawLine)
         {
             const result = this.graph.drawLine( line.p1 , line.p2 , 5 ,  0xf5dea3 , this.speed  );
@@ -109,7 +121,9 @@ export class QuickHullService extends ConvexHull
         this.convexHullStack.push( 
             [ rightLine , rightLineResult[1] , points , rightLineSide , false ]
              );
-
+        this.activeLines.push( leftLineResult[1] );
+        this.activeLines.push( rightLineResult[1] );
+        this.activeLines.push( oldLine );
 
         rightLineResult[0].call( () => {
 

@@ -1,5 +1,7 @@
 import { Graphics , Container , Sprite } from 'pixi.js';
 import { Vector2 } from '../point.model';
+import { SettingsService } from 'src/app/settings-service/settings-service';
+
 
 declare var createjs: any;
 
@@ -10,7 +12,7 @@ export class GraphService
     private graphicList : Graphics[] = [];
 
 
-    constructor(private container : Container)
+    constructor(private container : Container , private settingsService : SettingsService)
     {
 
     }
@@ -26,7 +28,8 @@ export class GraphService
         line.moveTo(from.x , from.y);
         var desirePos = new Vector2( from.x , from.y );
 
-        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, t * 70 );
+        var tween = createjs.Tween.get(desirePos).to({ x: to.x , y : to.y }, 
+            1000 / Math.pow( this.settingsService.currentSelectedSpeed , 1.25 )  );
 
         tween.addEventListener("change", () => {
           line.moveTo(from.x , from.y);

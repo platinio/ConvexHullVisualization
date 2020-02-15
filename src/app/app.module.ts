@@ -52,12 +52,12 @@ import { MatListModule } from '@angular/material/list';
     MatListModule
   ],  
 
-  providers: [ TweenService, SettingsService ],
+  providers: [ SettingsService ,TweenService ],
   bootstrap: [AppComponent]
 })
 
 @Injectable()
 export class AppModule
 {
-    constructor(private tweenService : TweenService){}
+    constructor(private settingsService : SettingsService, private tweenService : TweenService){}
 }

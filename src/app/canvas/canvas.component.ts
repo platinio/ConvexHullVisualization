@@ -32,6 +32,7 @@ export class CanvasComponent implements OnInit
     private maxRandomPoints : number = 40;
     private randomSpawnPointMargin : Vector2 = new Vector2(400 , 200);
     private speed : number = 20;  
+    private isRunning = false;
 
     
 
@@ -45,6 +46,7 @@ export class CanvasComponent implements OnInit
     {
         this.settingsService.onPlayCliked.subscribe( () => { this.calculateConvexHull(); });
         this.settingsService.onRandomClicked.subscribe( () => { this.createRandomPoints(); } );
+        this.isRunning = false;
     }
 
 
@@ -55,6 +57,7 @@ export class CanvasComponent implements OnInit
     //this.setupCreatejs();
     this.setupPixijs();
     this.pointList = [];
+    this.settingsService.isRunning = false;
 
   }
 
@@ -107,17 +110,31 @@ export class CanvasComponent implements OnInit
       this.pointList.push( new Point( this.tweenService , this.app.stage , new Vector2(x , y) ) );
   }
 
-  private calculateConvexHull()
-  {
-      if(this.settingsService.currentSelectedAlgorithm == "gift-wrapping")
-      {
-          this.calculateGifWrapping();
-      }
-      else
-      {
-          this.calculateQuickHull();
-      }
-  }
+    private calculateConvexHull()
+    {
+        if(this.pointList.length < 3)
+        {
+            return;
+        }
+
+        if(this.isRunning)
+        {
+            this.clearCanvas();
+            return;
+        }
+
+        this.settingsService.isRunning = true;
+        this.isRunning = true;
+
+        if(this.settingsService.currentSelectedAlgorithm == "gift-wrapping")
+        {
+            this.calculateGifWrapping();
+        }
+        else
+        {
+            this.calculateQuickHull();
+        }
+    }
 
   public calculateGifWrapping()
   {
@@ -127,7 +144,7 @@ export class CanvasComponent implements OnInit
           this.giftWrapping.stop();
       }
 
-      this.giftWrapping = new GiftWrappingService(this.pointList , this.app.stage , this.speed);
+      this.giftWrapping = new GiftWrappingService(this.pointList , this.app.stage , this.settingsService);
   }
 
   public calculateQuickHull()
@@ -138,7 +155,7 @@ export class CanvasComponent implements OnInit
           this.quickHull.stop();
       }
 
-      this.quickHull = new QuickHullService( this.pointList , this.app.stage , this.speed );
+      this.quickHull = new QuickHullService( this.pointList , this.app.stage , this.settingsService );
   }
 
   public clearCanvas()
@@ -149,13 +166,23 @@ export class CanvasComponent implements OnInit
             this.giftWrapping.stop();
       }
 
+      if(this.quickHull != null)
+      {
+          this.quickHull.clearAllLines();
+            this.quickHull.stop();
+      }
+
+
       for(let n = 0 ; n < this.pointList.length ; n++)
       {
           this.pointList[n].clear();
       }
 
+      this.settingsService.isRunning = false;
+      this.isRunning = false;
       this.pointList = [];
       this.giftWrapping = null;
+      this.quickHull = null;
   }
 
   public createRandomPoints()

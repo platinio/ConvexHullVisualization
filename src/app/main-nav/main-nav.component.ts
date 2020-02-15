@@ -31,10 +31,12 @@ export class MainNavComponent {
       map(result => result.matches),
       shareReplay()
     );
+    
 
   constructor(private breakpointObserver: BreakpointObserver , public settingsService : SettingsService) 
   {
       this.settingsService.currentSelectedAlgorithm = this.selectedAlgorithm;
+      this.settingsService.currentSelectedSpeed = 2;
   }
 
   public onAlgorithmSelectChange(selection : any)
@@ -53,5 +55,11 @@ export class MainNavComponent {
   {
       this.settingsService.onPlayCliked.emit();
   }
+
+  public onSpeedChange(value : any)
+  {
+    this.settingsService.currentSelectedSpeed = value;
+  }
+
 
 }

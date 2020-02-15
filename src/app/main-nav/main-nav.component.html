@@ -7,13 +7,13 @@
       >
     <mat-toolbar>Settings</mat-toolbar>
     <mat-nav-list fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap="1em">
-      <mat-select [(value)]="selectedAlgorithm" fxFlex="10">
+      <mat-select [(value)]="selectedAlgorithm" fxFlex="10" (selectionChange)="onAlgorithmSelectChange($event.value)">
           <mat-option *ngFor="let item of algorithmSelect" [value]="item.value">
             {{item.viewValue}}
           </mat-option>           
       </mat-select>    
-      <a>Random</a>
-      <a>Play</a>
+      <a (click)="onRandomClick()" >Random</a>
+      <a (click)="onPlayClick()" >Play</a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -38,11 +38,25 @@
         <button class="random-button" mat-raised-button
            (click)="onRandomClick()" 
            >Random</button>      
-        <span fxFlex="8 1 40"></span>   
-        <button mat-button>
+        <span fxFlex="8 1 30"></span>   
+        <mat-slider
+          fxFlex="1 1 20"
+          (input)="onSpeedChange($event.value)"
+          thumbLabel
+          min="1"
+          max="10"  
+          value="2"
+        ></mat-slider>
+        <button mat-button *ngIf="!settingsService.isRunning">
           <mat-icon class="material-icons"
           (click)="onPlayClick()"
           >play_circle_filled</mat-icon>
+        </button>
+
+        <button mat-button *ngIf="settingsService.isRunning">
+          <mat-icon class="material-icons"
+          (click)="onPlayClick()"
+          >pause_circle_filled</mat-icon>
         </button>
         <span ></span>  
           
